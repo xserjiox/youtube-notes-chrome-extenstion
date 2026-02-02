@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.claude/
+.idea/
+
+.DS_Store
+
+*.crx
+*.pem
+
+nul
