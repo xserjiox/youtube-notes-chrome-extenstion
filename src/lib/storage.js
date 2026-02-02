@@ -52,6 +52,20 @@ export async function deleteNote(videoId, noteId) {
   return notes;
 }
 
+export async function updateNoteText(videoId, noteId, newText) {
+  const key = `notes:${videoId}`;
+  const notes = await getNotes(videoId);
+  const note = notes.find((n) => n.id === noteId);
+  if (!note) return notes;
+  note.text = newText;
+  await chrome.storage.local.set({ [key]: notes });
+
+  const meta = await getVideoMeta(videoId);
+  await setVideoMeta(videoId, { ...meta, updatedAt: Date.now() });
+
+  return notes;
+}
+
 // --- Video Meta ---
 
 export async function getVideoMeta(videoId) {

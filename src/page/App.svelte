@@ -1,5 +1,5 @@
 <script>
-  import { getAllVideosWithNotes, getNotes, addNote, deleteNote } from '../lib/storage.js';
+  import { getAllVideosWithNotes, getNotes, addNote, deleteNote, updateNoteText } from '../lib/storage.js';
   import NotesList from '../components/NotesList.svelte';
   import NoteInput from '../components/NoteInput.svelte';
 
@@ -23,6 +23,11 @@
 
   async function handleDelete(videoId, noteId) {
     await deleteNote(videoId, noteId);
+    await loadAll();
+  }
+
+  async function handleEdit(videoId, noteId, newText) {
+    await updateNoteText(videoId, noteId, newText);
     await loadAll();
   }
 
@@ -61,6 +66,7 @@
           notes={videoNotes[video.videoId] || []}
           expanded={true}
           ondelete={(noteId) => handleDelete(video.videoId, noteId)}
+          onedit={(noteId, newText) => handleEdit(video.videoId, noteId, newText)}
           onseek={(seconds) => {
             if (!video.url) return;
             const url = new URL(video.url);

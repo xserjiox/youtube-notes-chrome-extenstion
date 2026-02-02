@@ -1,7 +1,7 @@
 <script>
   import NoteItem from './NoteItem.svelte';
 
-  let { notes, expanded = true, ondelete, onseek } = $props();
+  let { notes, expanded = true, ondelete, onseek, onedit } = $props();
 </script>
 
 {#if notes.length === 0}
@@ -10,7 +10,7 @@
   {#if expanded}
     <div class="notes-list">
       {#each notes as note (note.id)}
-        <NoteItem {note} {ondelete} {onseek} />
+        <NoteItem {note} {ondelete} {onseek} {onedit} />
       {/each}
     </div>
   {:else}

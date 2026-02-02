@@ -4,6 +4,7 @@
     getNotes,
     addNote,
     deleteNote,
+    updateNoteText,
     getAllVideosWithNotes,
     getVideoMeta,
     setVideoMeta,
@@ -51,6 +52,12 @@
     } else {
       await loadVideos();
     }
+  }
+
+  async function handleEdit(noteId, newText) {
+    if (!selectedVideo) return;
+    await updateNoteText(selectedVideo.videoId, noteId, newText);
+    notes = await getNotes(selectedVideo.videoId);
   }
 
   function goBack() {
@@ -117,7 +124,7 @@
     </div>
 
     <NoteInput onsave={handleSave} />
-    <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={handleSeek} />
+    <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={handleSeek} onedit={handleEdit} />
   {/if}
 </main>
 

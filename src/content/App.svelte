@@ -1,6 +1,6 @@
 <script>
   import { parseVideoId } from '../lib/utils.js';
-  import { getNotes, addNote, deleteNote, getVideoMeta, setVideoMeta } from '../lib/storage.js';
+  import { getNotes, addNote, deleteNote, updateNoteText, getVideoMeta, setVideoMeta } from '../lib/storage.js';
   import Trigger from './Trigger.svelte';
   import Overlay from './Overlay.svelte';
   import NotesList from '../components/NotesList.svelte';
@@ -71,6 +71,12 @@
   async function handleDelete(noteId) {
     if (!videoId) return;
     await deleteNote(videoId, noteId);
+    await loadNotes();
+  }
+
+  async function handleEdit(noteId, newText) {
+    if (!videoId) return;
+    await updateNoteText(videoId, noteId, newText);
     await loadNotes();
   }
 
@@ -145,6 +151,6 @@
       {adPlaying}
       showTimestampToggle={true}
     />
-    <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={handleSeek} />
+    <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={handleSeek} onedit={handleEdit} />
   </Overlay>
 {/if}
