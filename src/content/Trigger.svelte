@@ -16,6 +16,11 @@
         return;
       }
 
+      if (player.classList.contains('ad-showing')) {
+        visible = false;
+        return;
+      }
+
       if (isFullscreen()) {
         posTop = 10;
         posRight = 10;
