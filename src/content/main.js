@@ -1,5 +1,6 @@
 import App from './App.svelte';
 import { mount } from 'svelte';
+import { initThumbnailBadges } from './thumbnails.js';
 
 const host = document.createElement('div');
 host.id = 'youtube-notes-root';
@@ -15,3 +16,5 @@ for (const evt of ['keydown', 'keyup', 'keypress']) {
 }
 
 mount(App, { target: shadow });
+
+initThumbnailBadges();
