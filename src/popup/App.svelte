@@ -97,6 +97,21 @@
     if (!currentVideoId) return;
     try {
       const meta = await getVideoMeta(currentVideoId);
+
+      // Bug fix: fallback to tab title/url if meta has no title
+      if (!meta.title || !meta.url) {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab) {
+          if (!meta.title && tab.title) {
+            // Clean YouTube suffix from tab title
+            meta.title = tab.title.replace(/\s*-\s*YouTube\s*$/, '');
+          }
+          if (!meta.url && tab.url) {
+            meta.url = tab.url;
+          }
+        }
+      }
+
       await selectVideo(meta);
     } catch (err) {
       console.error('[YT-Notes] Failed to open current video:', err);
@@ -112,6 +127,11 @@
 
   function openFullPage() {
     chrome.tabs.create({ url: chrome.runtime.getURL('page.html') });
+  }
+
+  function openOnYouTube() {
+    if (!selectedVideo?.url) return;
+    chrome.tabs.create({ url: selectedVideo.url });
   }
 
   async function init() {
@@ -140,26 +160,52 @@
   {#if loading}
     <p class="status">Loading...</p>
   {:else if view === 'list'}
-    <div class="header">
-      <h1>YouTube Notes</h1>
-      <button class="link-btn" onclick={openFullPage}>Open full page</button>
+    <div class="header-banner">
+      <div class="header-banner-content">
+        <div>
+          <h1>YouTube Notes</h1>
+          <p class="subtitle">Your video notes collection</p>
+        </div>
+        <button class="expand-btn" onclick={openFullPage} title="Open full page">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h6v6"/>
+            <path d="M10 14L21 3"/>
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
-    {#if currentVideoId}
-      <button class="current-video-btn" onclick={openCurrentVideo}>
-        Current video notes &rarr;
-      </button>
-    {/if}
+    <div class="body-content">
+      {#if currentVideoId}
+        <button class="current-video-btn" onclick={openCurrentVideo}>
+          Current video notes &rarr;
+        </button>
+      {/if}
 
-    <VideoList {videos} onselect={selectVideo} />
+      <VideoList {videos} onselect={selectVideo} />
+    </div>
   {:else}
-    <div class="header">
+    <div class="notes-view">
       <button class="back-btn" onclick={goBack}>&larr; Back</button>
-      <h1 class="video-title">{selectedVideo?.title || selectedVideo?.videoId}</h1>
-    </div>
+      <h2 class="video-title">{selectedVideo?.title || selectedVideo?.videoId}</h2>
+      {#if selectedVideo?.url}
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <a class="open-youtube-link" href={selectedVideo.url} onclick={(e) => { e.preventDefault(); openOnYouTube(); }}>
+          Open on YouTube
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </a>
+      {/if}
 
-    <NoteInput onsave={handleSave} />
-    <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={handleSeek} onedit={handleEdit} />
+      <div class="notes-content">
+        <NoteInput onsave={handleSave} />
+        <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={handleSeek} onedit={handleEdit} />
+      </div>
+    </div>
   {/if}
 </main>
 
@@ -172,69 +218,69 @@
       sans-serif;
     font-size: 14px;
     color: #1a1a1a;
-    --ytn-brand: #1565c0;
-    --ytn-brand-hover: #0d47a1;
-    --ytn-brand-light: #e3f2fd;
-    --ytn-brand-light-hover: #bbdefb;
+    --ytn-brand: #cc0000;
+    --ytn-brand-hover: #a30000;
+    --ytn-brand-light: #fce4e4;
+    --ytn-brand-light-hover: #f5c6c6;
     --ytn-error: #e53935;
   }
 
   main {
     width: 360px;
-    padding: 16px;
-  }
-
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-
-  h1 {
-    font-size: 18px;
-    margin: 0;
-  }
-
-  .video-title {
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
-    flex: 1;
-    margin-left: 8px;
   }
 
   .status {
     color: #666;
     margin: 0;
+    padding: 16px;
   }
 
-  .link-btn {
-    background: none;
-    border: none;
-    color: var(--ytn-brand);
+  /* === List View: Red Banner Header === */
+  .header-banner {
+    background: var(--ytn-brand);
+    color: #fff;
+    padding: 16px;
+  }
+
+  .header-banner-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .header-banner h1 {
+    font-size: 18px;
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .subtitle {
+    margin: 4px 0 0;
     font-size: 12px;
-    cursor: pointer;
-    padding: 0;
-    white-space: nowrap;
+    opacity: 0.85;
   }
 
-  .link-btn:hover {
-    text-decoration: underline;
-  }
-
-  .back-btn {
+  .expand-btn {
     background: none;
     border: none;
-    color: var(--ytn-brand);
-    font-size: 14px;
+    color: #fff;
     cursor: pointer;
-    padding: 0;
-    white-space: nowrap;
+    padding: 4px;
+    opacity: 0.85;
+    border-radius: 4px;
+    flex-shrink: 0;
   }
 
+  .expand-btn:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .body-content {
+    padding: 12px 16px 16px;
+  }
+
+  /* === Current Video Button === */
   .current-video-btn {
     display: block;
     width: 100%;
@@ -246,11 +292,81 @@
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
+    font-weight: 500;
     text-align: left;
     font-family: inherit;
   }
 
   .current-video-btn:hover {
     background: var(--ytn-brand-light-hover);
+  }
+
+  /* === Notes Detail View === */
+  .notes-view {
+    padding: 16px;
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--ytn-brand);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .back-btn:hover {
+    text-decoration: underline;
+  }
+
+  .video-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    line-height: 1.3;
+    color: #1a1a1a;
+  }
+
+  .open-youtube-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--ytn-brand);
+    text-decoration: none;
+    margin-bottom: 12px;
+  }
+
+  .open-youtube-link:hover {
+    text-decoration: underline;
+  }
+
+  .notes-content {
+    margin-top: 4px;
+  }
+
+  /* === Global overrides for NoteItem inside popup === */
+  :global(main .note-item) {
+    border: 1px solid #e8e8e8 !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    margin-bottom: 8px !important;
+    border-bottom: 1px solid #e8e8e8 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  :global(main .note-item .timestamp) {
+    background: var(--ytn-brand) !important;
+    color: #fff !important;
+    border-radius: 4px;
+    padding: 2px 8px !important;
+    font-size: 11px;
+  }
+
+  :global(main .note-item .edit-btn),
+  :global(main .note-item .delete-btn) {
+    opacity: 1;
   }
 </style>

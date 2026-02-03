@@ -76,7 +76,11 @@ export async function getVideoMeta(videoId) {
 
 export async function setVideoMeta(videoId, meta) {
   const key = `meta:${videoId}`;
-  await chrome.storage.local.set({ [key]: { videoId, ...meta } });
+  const existing = await chrome.storage.local.get(key);
+  const prev = existing[key] || {};
+  await chrome.storage.local.set({
+    [key]: { videoId, ...meta, createdAt: prev.createdAt || Date.now() },
+  });
 }
 
 export async function getAllVideosWithNotes() {
@@ -87,6 +91,6 @@ export async function getAllVideosWithNotes() {
       videos.push(value);
     }
   }
-  videos.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  videos.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
   return videos;
 }

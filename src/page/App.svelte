@@ -1,7 +1,6 @@
 <script>
   import { getAllVideosWithNotes, getNotes, addNote, deleteNote, updateNoteText } from '../lib/storage.js';
-  import NotesList from '../components/NotesList.svelte';
-  import NoteInput from '../components/NoteInput.svelte';
+  import VideoAccordion from '../components/VideoAccordion.svelte';
 
   let videos = $state([]);
   let videoNotes = $state({});
@@ -23,7 +22,7 @@
     }
   }
 
-  async function handleSave(videoId, text) {
+  async function handleAddNote(videoId, text) {
     try {
       await addNote(videoId, text, null);
       await loadAll();
@@ -50,6 +49,14 @@
     }
   }
 
+  function handleSeek(videoId, seconds) {
+    const video = videos.find(v => v.videoId === videoId);
+    if (!video?.url) return;
+    const url = new URL(video.url);
+    url.searchParams.set('t', `${Math.floor(seconds)}s`);
+    window.open(url.toString(), '_blank');
+  }
+
   chrome.storage.onChanged.addListener(() => {
     loadAll().catch(err => console.error('[YT-Notes] Failed to reload data:', err));
   });
@@ -66,34 +73,14 @@
     <p class="status">No notes yet. Open a YouTube video and start adding notes!</p>
   {:else}
     {#each videos as video (video.videoId)}
-      <section class="video-section">
-        <div class="video-header">
-          <h2>
-            {#if video.url}
-              <a href={video.url} target="_blank" rel="noopener">{video.title || video.videoId}</a>
-            {:else}
-              {video.title || video.videoId}
-            {/if}
-          </h2>
-          <span class="note-count"
-            >{video.noteCount} note{video.noteCount === 1 ? '' : 's'}</span
-          >
-        </div>
-
-        <NoteInput onsave={(text) => handleSave(video.videoId, text)} />
-        <NotesList
-          notes={videoNotes[video.videoId] || []}
-          expanded={true}
-          ondelete={(noteId) => handleDelete(video.videoId, noteId)}
-          onedit={(noteId, newText) => handleEdit(video.videoId, noteId, newText)}
-          onseek={(seconds) => {
-            if (!video.url) return;
-            const url = new URL(video.url);
-            url.searchParams.set('t', `${Math.floor(seconds)}s`);
-            window.open(url.toString(), '_blank');
-          }}
-        />
-      </section>
+      <VideoAccordion
+        {video}
+        notes={videoNotes[video.videoId] || []}
+        onaddnote={handleAddNote}
+        ondeletenote={handleDelete}
+        oneditnote={handleEdit}
+        onseek={handleSeek}
+      />
     {/each}
   {/if}
 </main>
@@ -116,7 +103,7 @@
   }
 
   main {
-    max-width: 720px;
+    max-width: 960px;
     margin: 0 auto;
     padding: 32px 24px;
   }
@@ -130,38 +117,39 @@
     color: #666;
   }
 
-  .video-section {
-    background: white;
-    border-radius: 8px;
-    padding: 16px 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  /* === Global overrides for NoteItem inside page view === */
+  :global(main .note-item) {
+    border: 1px solid #e8e8e8 !important;
+    border-radius: 8px !important;
+    padding: 10px 12px !important;
+    margin-bottom: 8px !important;
+    border-bottom: 1px solid #e8e8e8 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: background 0.15s, box-shadow 0.15s;
   }
 
-  .video-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 8px;
+  :global(main .note-item.editing) {
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    background: none !important;
   }
 
-  .video-header h2 {
-    margin: 0;
-    font-size: 16px;
+  :global(main .note-item:not(.editing):hover) {
+    background: #f7f7f7 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   }
 
-  .video-header a {
-    color: var(--ytn-brand);
-    text-decoration: none;
+  :global(main .note-item .timestamp) {
+    background: #cc0000 !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+    padding: 3px 10px !important;
+    font-size: 13px !important;
   }
 
-  .video-header a:hover {
-    text-decoration: underline;
-  }
-
-  .note-count {
-    font-size: 12px;
-    color: #888;
-    white-space: nowrap;
+  :global(main .note-item .edit-btn),
+  :global(main .note-item .delete-btn) {
+    opacity: 1;
   }
 </style>
