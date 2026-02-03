@@ -1,4 +1,4 @@
-import { BRAND, BRAND_ALPHA } from '../../lib/constants.js';
+import { BRAND, FAB_BG, FAB_BG_HOVER, FAB_ICON_COLOR, FAB_SHADOW } from '../../lib/constants.js';
 
 export const DEBOUNCE_MS = 500;
 const Z_OVERLAY = 2147483646;
@@ -21,20 +21,26 @@ const CSS = `
   height: 32px;
   border-radius: 50%;
   border: none;
-  background: ${BRAND_ALPHA};
-  color: white;
+  background: ${FAB_BG};
+  color: ${FAB_ICON_COLOR};
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: ${Z_BUTTON};
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  box-shadow: ${FAB_SHADOW};
   padding: 0;
+  transition: background 0.15s;
+}
+
+.${BTN_CLASS}:hover,
+.${PREVIEW_BTN_CLASS}:hover {
+  background: ${FAB_BG_HOVER};
 }
 
 .${BTN_CLASS} {
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, background 0.15s;
 }
 
 [${PROCESSED_ATTR}]:hover > .${BTN_CLASS} {
@@ -58,8 +64,8 @@ const CSS = `
   display: flex;
   align-items: center;
   gap: 3px;
-  background: ${BRAND_ALPHA};
-  color: white;
+  background: ${FAB_BG};
+  color: ${FAB_ICON_COLOR};
   font-size: 11px;
   font-weight: 600;
   padding: 2px 6px;
@@ -212,11 +218,9 @@ const CSS = `
 
 const noteIconTemplate = document.createElement('template');
 noteIconTemplate.innerHTML =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">' +
-  '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
-  '<polyline points="14 2 14 8 20 8"/>' +
-  '<line x1="16" y1="13" x2="8" y2="13"/>' +
-  '<line x1="16" y1="17" x2="8" y2="17"/>' +
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">' +
+  '<rect x="3" y="7" width="12" height="15" rx="2"/>' +
+  '<path d="M9 7V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-3"/>' +
   '</svg>';
 
 export function createNoteIcon(size, strokeWidth) {
