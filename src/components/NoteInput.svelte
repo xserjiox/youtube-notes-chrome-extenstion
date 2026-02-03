@@ -60,7 +60,7 @@
   }
 
   textarea:focus {
-    border-color: #1565c0;
+    border-color: var(--ytn-brand);
   }
 
   .input-actions {
@@ -89,7 +89,7 @@
   }
 
   .save-btn {
-    background: #1565c0;
+    background: var(--ytn-brand);
     color: white;
     border: none;
     border-radius: 4px;
@@ -99,7 +99,7 @@
   }
 
   .save-btn:hover:not(:disabled) {
-    background: #0d47a1;
+    background: var(--ytn-brand-hover);
   }
 
   .save-btn:disabled {

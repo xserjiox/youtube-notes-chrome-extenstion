@@ -76,8 +76,8 @@
 <style>
   .picker-display {
     display: inline-block;
-    background: #e3f2fd;
-    color: #1565c0;
+    background: var(--ytn-brand-light);
+    color: var(--ytn-brand);
     font-size: 11px;
     font-weight: 600;
     padding: 1px 6px;
@@ -88,7 +88,7 @@
   }
 
   .picker-display:hover:not(.disabled) {
-    background: #bbdefb;
+    background: var(--ytn-brand-light-hover);
   }
 
   .picker-display.disabled {
@@ -108,17 +108,17 @@
     font-family: monospace;
     font-weight: 600;
     padding: 1px 6px;
-    border: 1px solid #1565c0;
+    border: 1px solid var(--ytn-brand);
     border-radius: 4px;
     outline: none;
-    background: #e3f2fd;
-    color: #1565c0;
+    background: var(--ytn-brand-light);
+    color: var(--ytn-brand);
   }
 
   .picker-input.invalid {
-    border-color: #e53935;
+    border-color: var(--ytn-error);
     background: #ffebee;
-    color: #e53935;
+    color: var(--ytn-error);
   }
 
   .picker-hint {

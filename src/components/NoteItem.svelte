@@ -107,8 +107,8 @@
 
   .timestamp {
     display: inline-block;
-    background: #e3f2fd;
-    color: #1565c0;
+    background: var(--ytn-brand-light);
+    color: var(--ytn-brand);
     font-size: 11px;
     font-weight: 600;
     padding: 1px 6px;
@@ -136,7 +136,7 @@
 
   .edit-textarea:focus {
     outline: none;
-    border-color: #1565c0;
+    border-color: var(--ytn-brand);
   }
 
   .edit-actions {
@@ -155,13 +155,13 @@
   }
 
   .save-btn {
-    background: #1565c0;
+    background: var(--ytn-brand);
     color: white;
-    border-color: #1565c0;
+    border-color: var(--ytn-brand);
   }
 
   .save-btn:hover {
-    background: #1255a1;
+    background: var(--ytn-brand-hover);
   }
 
   .cancel-btn {
@@ -184,7 +184,7 @@
   }
 
   .edit-btn:hover {
-    color: #1565c0;
+    color: var(--ytn-brand);
   }
 
   .delete-btn {
@@ -199,6 +199,6 @@
   }
 
   .delete-btn:hover {
-    color: #e53935;
+    color: var(--ytn-error);
   }
 </style>

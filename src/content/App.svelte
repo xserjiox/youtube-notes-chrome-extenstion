@@ -15,16 +15,26 @@
   let adPlaying = $state(false);
   let lastKnownPosition = null;
 
+  const POSITION_POLL_MS = 1000;
+
+  function getVideoElement() {
+    return document.querySelector('video');
+  }
+
+  function getPlayerElement() {
+    return document.querySelector('#movie_player');
+  }
+
   function detectVideoId() {
     return parseVideoId(location.href);
   }
 
   function isAdPlaying() {
-    return document.querySelector('#movie_player')?.classList.contains('ad-showing') ?? false;
+    return getPlayerElement()?.classList.contains('ad-showing') ?? false;
   }
 
   function getVideoTimestamp() {
-    const video = document.querySelector('video');
+    const video = getVideoElement();
     if (!video) return 0;
     if (isAdPlaying()) return lastKnownPosition ?? 0;
     lastKnownPosition = Math.floor(video.currentTime);
@@ -44,84 +54,114 @@
       noteCount = 0;
       return;
     }
-    notes = await getNotes(videoId);
-    noteCount = notes.length;
+    try {
+      notes = await getNotes(videoId);
+      noteCount = notes.length;
+    } catch (err) {
+      console.error('[YT-Notes] Failed to load notes:', err);
+      notes = [];
+      noteCount = 0;
+    }
   }
 
   async function handleSave(text, timestamp) {
     if (!videoId) return;
-    await addNote(videoId, text, timestamp);
+    try {
+      await addNote(videoId, text, timestamp);
 
-    // Save or update video meta
-    const meta = await getVideoMeta(videoId);
-    await setVideoMeta(videoId, {
-      ...meta,
-      title: getVideoTitle(),
-      url: location.href,
-    });
+      // Save or update video meta
+      const meta = await getVideoMeta(videoId);
+      await setVideoMeta(videoId, {
+        ...meta,
+        title: getVideoTitle(),
+        url: location.href,
+      });
 
-    await loadNotes();
+      await loadNotes();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to save note:', err);
+    }
   }
 
   function handleSeek(seconds) {
-    const video = document.querySelector('video');
+    const video = getVideoElement();
     if (video) video.currentTime = seconds;
   }
 
   async function handleDelete(noteId) {
     if (!videoId) return;
-    await deleteNote(videoId, noteId);
-    await loadNotes();
+    try {
+      await deleteNote(videoId, noteId);
+      await loadNotes();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to delete note:', err);
+    }
   }
 
   async function handleEdit(noteId, newText) {
     if (!videoId) return;
-    await updateNoteText(videoId, noteId, newText);
-    await loadNotes();
+    try {
+      await updateNoteText(videoId, noteId, newText);
+      await loadNotes();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to edit note:', err);
+    }
   }
 
   async function onNavigate() {
-    const newId = detectVideoId();
-    if (newId !== videoId) {
-      videoId = newId;
-      await loadNotes();
+    try {
+      const newId = detectVideoId();
+      if (newId !== videoId) {
+        videoId = newId;
+        await loadNotes();
+      }
+    } catch (err) {
+      console.error('[YT-Notes] Failed to handle navigation:', err);
     }
   }
 
-  // Track YouTube SPA navigation
-  const observer = new MutationObserver(() => onNavigate());
-  observer.observe(document.querySelector('title') || document.head, {
-    childList: true,
-    subtree: true,
-    characterData: true,
-  });
-
-  // Also listen to popstate / yt-navigate-finish
-  window.addEventListener('yt-navigate-finish', () => onNavigate());
-
-  // Listen for storage changes from other contexts
-  chrome.storage.onChanged.addListener((changes) => {
-    if (videoId && changes[`notes:${videoId}`]) {
-      loadNotes();
-    }
-  });
-
-  // Initial load
-  onNavigate();
-
-  // Track video position in background so it's available during ads
-  setInterval(() => {
-    if (videoId && !isAdPlaying()) {
-      const video = document.querySelector('video');
-      if (video) lastKnownPosition = Math.floor(video.currentTime);
-    }
-  }, 1000);
-
   function getVideoDuration() {
-    const video = document.querySelector('video');
+    const video = getVideoElement();
     if (!video || !video.duration || !isFinite(video.duration)) return null;
     return Math.floor(video.duration);
   }
+
+  // Side-effects with cleanup
+  $effect(() => {
+    const observer = new MutationObserver(() => onNavigate());
+    observer.observe(document.querySelector('title') || document.head, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    const handleNavigate = () => onNavigate();
+    window.addEventListener('yt-navigate-finish', handleNavigate);
+
+    const handleStorageChange = (changes) => {
+      if (videoId && changes[`notes:${videoId}`]) {
+        loadNotes().catch(err => console.error('[YT-Notes] Failed to reload notes:', err));
+      }
+    };
+    chrome.storage.onChanged.addListener(handleStorageChange);
+
+    const positionInterval = setInterval(() => {
+      if (videoId && !isAdPlaying()) {
+        const video = getVideoElement();
+        if (video) lastKnownPosition = Math.floor(video.currentTime);
+      }
+    }, POSITION_POLL_MS);
+
+    // Initial load
+    onNavigate();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('yt-navigate-finish', handleNavigate);
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+      clearInterval(positionInterval);
+    };
+  });
 
   // Set timestamp on modal open; update duration while open
   $effect(() => {

@@ -1,5 +1,8 @@
 // YouTube Notes - Service Worker (background)
 
+import { parseVideoId } from '../lib/utils.js';
+import { BRAND } from '../lib/constants.js';
+
 chrome.runtime.onInstalled.addListener(() => {
   console.log('YouTube Notes extension installed');
 });
@@ -28,19 +31,7 @@ async function updateBadge() {
       return;
     }
 
-    let videoId = null;
-    try {
-      const url = new URL(tab.url);
-      if (url.hostname.includes('youtube.com')) {
-        if (url.pathname.startsWith('/shorts/')) {
-          videoId = url.pathname.split('/')[2] || null;
-        } else {
-          videoId = url.searchParams.get('v');
-        }
-      }
-    } catch {
-      // invalid URL
-    }
+    const videoId = parseVideoId(tab.url);
 
     if (!videoId) {
       chrome.action.setBadgeText({ text: '' });
@@ -53,7 +44,7 @@ async function updateBadge() {
     const count = meta?.noteCount || 0;
 
     chrome.action.setBadgeText({ text: count > 0 ? String(count) : '' });
-    chrome.action.setBadgeBackgroundColor({ color: '#1565c0' });
+    chrome.action.setBadgeBackgroundColor({ color: BRAND });
   } catch {
     // tab query can fail if no active window
   }

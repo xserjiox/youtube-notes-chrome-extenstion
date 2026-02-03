@@ -81,7 +81,7 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #1565c0;
+    background: var(--ytn-brand);
     color: white;
     border: none;
     cursor: pointer;
@@ -95,14 +95,14 @@
 
   .fab:hover {
     opacity: 1;
-    background: #0d47a1;
+    background: var(--ytn-brand-hover);
   }
 
   .badge {
     position: absolute;
     top: -4px;
     right: -4px;
-    background: #e53935;
+    background: var(--ytn-error);
     color: white;
     font-size: 11px;
     font-weight: 700;

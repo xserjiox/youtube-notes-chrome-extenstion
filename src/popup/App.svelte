@@ -21,56 +21,86 @@
   let currentVideoId = $state(null);
 
   async function getCurrentTabVideoId() {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab?.url) return null;
-    return parseVideoId(tab.url);
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab?.url) return null;
+      return parseVideoId(tab.url);
+    } catch (err) {
+      console.error('[YT-Notes] Failed to get current tab video ID:', err);
+      return null;
+    }
   }
 
   async function loadVideos() {
-    videos = await getAllVideosWithNotes();
+    try {
+      videos = await getAllVideosWithNotes();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to load videos:', err);
+      videos = [];
+    }
   }
 
   async function selectVideo(video) {
-    selectedVideo = video;
-    notes = await getNotes(video.videoId);
-    view = 'notes';
+    try {
+      selectedVideo = video;
+      notes = await getNotes(video.videoId);
+      view = 'notes';
+    } catch (err) {
+      console.error('[YT-Notes] Failed to select video:', err);
+    }
   }
 
   async function handleSave(text) {
     if (!selectedVideo) return;
-    await addNote(selectedVideo.videoId, text, null);
-    notes = await getNotes(selectedVideo.videoId);
-    await loadVideos();
+    try {
+      await addNote(selectedVideo.videoId, text, null);
+      notes = await getNotes(selectedVideo.videoId);
+      await loadVideos();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to save note:', err);
+    }
   }
 
   async function handleDelete(noteId) {
     if (!selectedVideo) return;
-    await deleteNote(selectedVideo.videoId, noteId);
-    notes = await getNotes(selectedVideo.videoId);
-    if (notes.length === 0) {
-      goBack();
-    } else {
-      await loadVideos();
+    try {
+      await deleteNote(selectedVideo.videoId, noteId);
+      notes = await getNotes(selectedVideo.videoId);
+      if (notes.length === 0) {
+        goBack();
+      } else {
+        await loadVideos();
+      }
+    } catch (err) {
+      console.error('[YT-Notes] Failed to delete note:', err);
     }
   }
 
   async function handleEdit(noteId, newText) {
     if (!selectedVideo) return;
-    await updateNoteText(selectedVideo.videoId, noteId, newText);
-    notes = await getNotes(selectedVideo.videoId);
+    try {
+      await updateNoteText(selectedVideo.videoId, noteId, newText);
+      notes = await getNotes(selectedVideo.videoId);
+    } catch (err) {
+      console.error('[YT-Notes] Failed to edit note:', err);
+    }
   }
 
   function goBack() {
     view = 'list';
     selectedVideo = null;
     notes = [];
-    loadVideos();
+    loadVideos().catch(err => console.error('[YT-Notes] Failed to reload videos:', err));
   }
 
   async function openCurrentVideo() {
     if (!currentVideoId) return;
-    const meta = await getVideoMeta(currentVideoId);
-    await selectVideo(meta);
+    try {
+      const meta = await getVideoMeta(currentVideoId);
+      await selectVideo(meta);
+    } catch (err) {
+      console.error('[YT-Notes] Failed to open current video:', err);
+    }
   }
 
   function handleSeek(seconds) {
@@ -85,16 +115,21 @@
   }
 
   async function init() {
-    currentVideoId = await getCurrentTabVideoId();
-    await loadVideos();
-    loading = false;
+    try {
+      currentVideoId = await getCurrentTabVideoId();
+      await loadVideos();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to initialize popup:', err);
+    } finally {
+      loading = false;
+    }
   }
 
   chrome.storage.onChanged.addListener(() => {
     if (view === 'list') {
-      loadVideos();
+      loadVideos().catch(err => console.error('[YT-Notes] Failed to reload videos:', err));
     } else if (selectedVideo) {
-      getNotes(selectedVideo.videoId).then((n) => (notes = n));
+      getNotes(selectedVideo.videoId).then((n) => (notes = n)).catch(err => console.error('[YT-Notes] Failed to reload notes:', err));
     }
   });
 
@@ -137,6 +172,11 @@
       sans-serif;
     font-size: 14px;
     color: #1a1a1a;
+    --ytn-brand: #1565c0;
+    --ytn-brand-hover: #0d47a1;
+    --ytn-brand-light: #e3f2fd;
+    --ytn-brand-light-hover: #bbdefb;
+    --ytn-error: #e53935;
   }
 
   main {
@@ -174,7 +214,7 @@
   .link-btn {
     background: none;
     border: none;
-    color: #1565c0;
+    color: var(--ytn-brand);
     font-size: 12px;
     cursor: pointer;
     padding: 0;
@@ -188,7 +228,7 @@
   .back-btn {
     background: none;
     border: none;
-    color: #1565c0;
+    color: var(--ytn-brand);
     font-size: 14px;
     cursor: pointer;
     padding: 0;
@@ -200,9 +240,9 @@
     width: 100%;
     padding: 10px;
     margin-bottom: 12px;
-    background: #e3f2fd;
-    color: #1565c0;
-    border: 1px solid #bbdefb;
+    background: var(--ytn-brand-light);
+    color: var(--ytn-brand);
+    border: 1px solid var(--ytn-brand-light-hover);
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
@@ -211,6 +251,6 @@
   }
 
   .current-video-btn:hover {
-    background: #bbdefb;
+    background: var(--ytn-brand-light-hover);
   }
 </style>

@@ -8,34 +8,53 @@
   let loading = $state(true);
 
   async function loadAll() {
-    videos = await getAllVideosWithNotes();
-    const notesMap = {};
-    for (const v of videos) {
-      notesMap[v.videoId] = await getNotes(v.videoId);
+    try {
+      videos = await getAllVideosWithNotes();
+      const notesMap = {};
+      for (const v of videos) {
+        notesMap[v.videoId] = await getNotes(v.videoId);
+      }
+      videoNotes = notesMap;
+    } catch (err) {
+      console.error('[YT-Notes] Failed to load all data:', err);
+      loading = false;
+      videos = [];
+      videoNotes = {};
     }
-    videoNotes = notesMap;
   }
 
   async function handleSave(videoId, text) {
-    await addNote(videoId, text, null);
-    await loadAll();
+    try {
+      await addNote(videoId, text, null);
+      await loadAll();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to save note:', err);
+    }
   }
 
   async function handleDelete(videoId, noteId) {
-    await deleteNote(videoId, noteId);
-    await loadAll();
+    try {
+      await deleteNote(videoId, noteId);
+      await loadAll();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to delete note:', err);
+    }
   }
 
   async function handleEdit(videoId, noteId, newText) {
-    await updateNoteText(videoId, noteId, newText);
-    await loadAll();
+    try {
+      await updateNoteText(videoId, noteId, newText);
+      await loadAll();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to edit note:', err);
+    }
   }
 
   chrome.storage.onChanged.addListener(() => {
-    loadAll();
+    loadAll().catch(err => console.error('[YT-Notes] Failed to reload data:', err));
   });
 
-  loadAll().then(() => (loading = false));
+  loadAll().then(() => (loading = false)).catch(err => console.error('[YT-Notes] Failed to initialize:', err));
 </script>
 
 <main>
@@ -89,6 +108,11 @@
     font-size: 14px;
     color: #1a1a1a;
     background: #fafafa;
+    --ytn-brand: #1565c0;
+    --ytn-brand-hover: #0d47a1;
+    --ytn-brand-light: #e3f2fd;
+    --ytn-brand-light-hover: #bbdefb;
+    --ytn-error: #e53935;
   }
 
   main {
@@ -127,7 +151,7 @@
   }
 
   .video-header a {
-    color: #1565c0;
+    color: var(--ytn-brand);
     text-decoration: none;
   }
 
