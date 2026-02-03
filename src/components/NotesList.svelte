@@ -20,8 +20,11 @@
 
 <style>
   .notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     padding: 0;
-    margin: 0;
+    margin: 8px 0 0 0;
   }
 
   .empty {

@@ -1,5 +1,5 @@
 <script>
-  let { onclose, children } = $props();
+  let { onclose, children, title = 'Video Notes' } = $props();
 
   let mousedownOnBackdrop = false;
 
@@ -28,11 +28,14 @@
 <div class="backdrop" onmousedown={handleMousedown} onclick={handleBackdrop}>
   <div class="modal">
     <div class="modal-header">
-      <h2>YouTube Notes</h2>
+      <h2>{title}</h2>
       <button class="close-btn" onclick={onclose}>&times;</button>
     </div>
     <div class="modal-body">
       {@render children()}
+    </div>
+    <div class="modal-footer">
+      Press Esc to close &bull; Click outside to dismiss
     </div>
   </div>
 </div>
@@ -51,7 +54,7 @@
   .modal {
     background: white;
     border-radius: 12px;
-    width: 420px;
+    width: 620px;
     max-width: 90vw;
     max-height: 80vh;
     display: flex;
@@ -72,6 +75,11 @@
     margin: 0;
     font-size: 16px;
     color: #1a1a1a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1;
   }
 
   .close-btn {
@@ -82,6 +90,8 @@
     cursor: pointer;
     padding: 0 4px;
     line-height: 1;
+    flex-shrink: 0;
+    margin-left: 8px;
   }
 
   .close-btn:hover {
@@ -92,5 +102,13 @@
     padding: 16px 20px;
     overflow-y: auto;
     flex: 1;
+  }
+
+  .modal-footer {
+    text-align: center;
+    font-size: 11px;
+    color: #999;
+    padding: 10px 20px;
+    border-top: 1px solid #eee;
   }
 </style>

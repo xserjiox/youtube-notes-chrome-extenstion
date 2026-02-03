@@ -17,7 +17,7 @@ export async function addNote(videoId, text, timestamp = null) {
     timestamp,
     createdAt: Date.now(),
   };
-  notes.push(note);
+  notes.unshift(note);
   await chrome.storage.local.set({ [key]: notes });
 
   // Update meta

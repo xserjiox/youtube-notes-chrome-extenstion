@@ -307,18 +307,23 @@
   }
 
   .back-btn {
-    background: none;
-    border: none;
-    color: var(--ytn-brand);
-    font-size: 14px;
-    cursor: pointer;
-    padding: 0;
-    margin-bottom: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #555;
+    font-size: 13px;
     font-weight: 500;
+    cursor: pointer;
+    padding: 6px 14px;
+    margin-bottom: 12px;
+    font-family: inherit;
+    border-radius: 8px;
   }
 
   .back-btn:hover {
-    text-decoration: underline;
+    background: #f5f5f5;
   }
 
   .video-title {
@@ -347,26 +352,4 @@
     margin-top: 4px;
   }
 
-  /* === Global overrides for NoteItem inside popup === */
-  :global(main .note-item) {
-    border: 1px solid #e8e8e8 !important;
-    border-radius: 8px !important;
-    padding: 10px !important;
-    margin-bottom: 8px !important;
-    border-bottom: 1px solid #e8e8e8 !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  }
-
-  :global(main .note-item .timestamp) {
-    background: var(--ytn-brand) !important;
-    color: #fff !important;
-    border-radius: 4px;
-    padding: 2px 8px !important;
-    font-size: 11px;
-  }
-
-  :global(main .note-item .edit-btn),
-  :global(main .note-item .delete-btn) {
-    opacity: 1;
-  }
 </style>

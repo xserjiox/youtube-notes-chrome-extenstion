@@ -96,9 +96,14 @@
 <style>
   .note-item {
     padding: 14px 16px;
-    border-bottom: 1px solid #eee;
-    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
     transition: background 0.15s;
+  }
+
+  .note-item.editing {
+    border-color: transparent;
+    padding: 0;
   }
 
   .note-item:not(.editing):hover {
@@ -140,9 +145,9 @@
 
   .timestamp {
     display: inline-block;
-    background: var(--ytn-brand-light);
-    color: var(--ytn-brand);
-    font-size: 13px;
+    background: #c62828;
+    color: white;
+    font-size: 12px;
     font-weight: 600;
     padding: 3px 10px;
     border-radius: 6px;

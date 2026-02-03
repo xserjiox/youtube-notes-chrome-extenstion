@@ -1,5 +1,6 @@
 <script>
   import { parseVideoId } from '../lib/utils.js';
+  import { OPEN_NOTES_EVENT, CLOSE_NOTES_EVENT } from '../lib/constants.js';
   import { getNotes, addNote, deleteNote, updateNoteText, getVideoMeta, setVideoMeta } from '../lib/storage.js';
   import Trigger from './Trigger.svelte';
   import Overlay from './Overlay.svelte';
@@ -14,6 +15,12 @@
   let videoDuration = $state(null);
   let adPlaying = $state(false);
   let lastKnownPosition = null;
+
+  // External (thumbnail) mode state
+  let externalVideoId = $state(null);
+  let externalTitle = $state(null);
+  let externalMode = $derived(externalVideoId !== null);
+  let effectiveVideoId = $derived(externalVideoId ?? videoId);
 
   const POSITION_POLL_MS = 1000;
 
@@ -65,19 +72,30 @@
   }
 
   async function handleSave(text, timestamp) {
-    if (!videoId) return;
+    if (!effectiveVideoId) return;
     try {
-      await addNote(videoId, text, timestamp);
+      await addNote(effectiveVideoId, text, timestamp);
 
-      // Save or update video meta
-      const meta = await getVideoMeta(videoId);
-      await setVideoMeta(videoId, {
-        ...meta,
-        title: getVideoTitle(),
-        url: location.href,
-      });
+      if (externalMode) {
+        const meta = await getVideoMeta(effectiveVideoId);
+        await setVideoMeta(effectiveVideoId, {
+          ...meta,
+          title: externalTitle || effectiveVideoId,
+          url: `https://www.youtube.com/watch?v=${effectiveVideoId}`,
+        });
+      } else {
+        const meta = await getVideoMeta(effectiveVideoId);
+        await setVideoMeta(effectiveVideoId, {
+          ...meta,
+          title: getVideoTitle(),
+          url: location.href,
+        });
+      }
 
-      await loadNotes();
+      // Reload notes for the effective video
+      notes = await getNotes(effectiveVideoId);
+      noteCount = externalMode ? noteCount : notes.length;
+      if (!externalMode) noteCount = notes.length;
     } catch (err) {
       console.error('[YT-Notes] Failed to save note:', err);
     }
@@ -89,22 +107,46 @@
   }
 
   async function handleDelete(noteId) {
-    if (!videoId) return;
+    if (!effectiveVideoId) return;
     try {
-      await deleteNote(videoId, noteId);
-      await loadNotes();
+      await deleteNote(effectiveVideoId, noteId);
+      notes = await getNotes(effectiveVideoId);
+      if (!externalMode) noteCount = notes.length;
     } catch (err) {
       console.error('[YT-Notes] Failed to delete note:', err);
     }
   }
 
   async function handleEdit(noteId, newText) {
-    if (!videoId) return;
+    if (!effectiveVideoId) return;
     try {
-      await updateNoteText(videoId, noteId, newText);
-      await loadNotes();
+      await updateNoteText(effectiveVideoId, noteId, newText);
+      notes = await getNotes(effectiveVideoId);
     } catch (err) {
       console.error('[YT-Notes] Failed to edit note:', err);
+    }
+  }
+
+  function handleClose() {
+    open = false;
+    externalVideoId = null;
+    externalTitle = null;
+    // Reload notes for the current page video (if on a watch page)
+    if (videoId) loadNotes();
+  }
+
+  async function handleExternalOpen(e) {
+    const { videoId: extId, title } = e.detail;
+    externalVideoId = extId;
+    externalTitle = title || extId;
+    open = true;
+    notes = await getNotes(extId);
+    noteCount = notes.length;
+  }
+
+  function handleExternalClose() {
+    if (externalMode) {
+      handleClose();
     }
   }
 
@@ -113,6 +155,8 @@
       const newId = detectVideoId();
       if (newId !== videoId) {
         videoId = newId;
+        // Close popup on navigation
+        if (open) handleClose();
         await loadNotes();
       }
     } catch (err) {
@@ -152,6 +196,10 @@
       }
     }, POSITION_POLL_MS);
 
+    // Listen for external open/close events (from thumbnail buttons)
+    window.addEventListener(OPEN_NOTES_EVENT, handleExternalOpen);
+    window.addEventListener(CLOSE_NOTES_EVENT, handleExternalClose);
+
     // Initial load
     onNavigate();
 
@@ -160,12 +208,14 @@
       window.removeEventListener('yt-navigate-finish', handleNavigate);
       chrome.storage.onChanged.removeListener(handleStorageChange);
       clearInterval(positionInterval);
+      window.removeEventListener(OPEN_NOTES_EVENT, handleExternalOpen);
+      window.removeEventListener(CLOSE_NOTES_EVENT, handleExternalClose);
     };
   });
 
   // Set timestamp on modal open; update duration while open
   $effect(() => {
-    if (open) {
+    if (open && !externalMode) {
       currentTimestamp = getVideoTimestamp();
       videoDuration = getVideoDuration();
       adPlaying = isAdPlaying();
@@ -182,15 +232,15 @@
   <Trigger noteCount={noteCount} onclick={() => (open = !open)} />
 {/if}
 
-{#if open && videoId}
-  <Overlay onclose={() => (open = false)}>
+{#if open && effectiveVideoId}
+  <Overlay onclose={handleClose} title={externalMode ? externalTitle : 'Video Notes'}>
     <NoteInput
       onsave={handleSave}
       bind:timestamp={currentTimestamp}
       duration={videoDuration}
       {adPlaying}
-      showTimestampToggle={true}
+      showTimestampToggle={!externalMode}
     />
-    <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={handleSeek} onedit={handleEdit} />
+    <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={externalMode ? null : handleSeek} onedit={handleEdit} />
   </Overlay>
 {/if}

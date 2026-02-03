@@ -1,7 +1,7 @@
-import { state } from './state.js';
 import { parseVideoId } from '../../lib/utils.js';
+import { OPEN_NOTES_EVENT } from '../../lib/constants.js';
+import { extractVideoTitle } from './title-extractor.js';
 import { BTN_CLASS, PREVIEW_BTN_CLASS, createNoteIcon } from './styles.js';
-import { openPanel } from './note-panel.js';
 
 export function createNoteButton(videoId, container) {
   const btn = document.createElement('button');
@@ -9,17 +9,11 @@ export function createNoteButton(videoId, container) {
   btn.title = 'Notes';
   btn.appendChild(createNoteIcon(14, 2));
 
-  container.addEventListener('mouseleave', function hideButtonIfInactive() {
-    if (!state.activePanel || state.activePanel.dataset.videoId !== videoId) {
-      btn.classList.remove('ytn-visible');
-    }
-  });
-
   btn.addEventListener('click', function handleNoteButtonClick(e) {
     e.preventDefault();
     e.stopPropagation();
-    btn.classList.add('ytn-visible');
-    openPanel(videoId, btn);
+    const title = extractVideoTitle(btn);
+    window.dispatchEvent(new CustomEvent(OPEN_NOTES_EVENT, { detail: { videoId, title } }));
   });
 
   return btn;
@@ -44,7 +38,8 @@ export function injectPreviewButton() {
   btn.addEventListener('click', function handlePreviewClick(e) {
     e.preventDefault();
     e.stopPropagation();
-    openPanel(videoId, btn);
+    const title = extractVideoTitle(btn);
+    window.dispatchEvent(new CustomEvent(OPEN_NOTES_EVENT, { detail: { videoId, title } }));
   });
 
   container.appendChild(btn);
