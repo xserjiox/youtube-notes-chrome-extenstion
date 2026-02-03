@@ -28,28 +28,28 @@
 <style>
   .fab {
     border-radius: 50%;
-    background: #3a3a3a;
-    color: #9e9e9e;
+    background: var(--ytn-fab-bg, #3a3a3a);
+    color: var(--ytn-fab-icon-color, #9e9e9e);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--ytn-fab-shadow, 0 2px 10px rgba(0, 0, 0, 0.4));
     padding: 0;
     position: relative;
     transition: background 0.15s;
   }
 
   .fab:hover {
-    background: #4a4a4a;
+    background: var(--ytn-fab-bg-hover, #4a4a4a);
   }
 
   .badge {
     position: absolute;
     top: -4px;
     right: -4px;
-    background: #e53935;
+    background: var(--ytn-error, #e53935);
     color: white;
     font-size: 11px;
     font-weight: 700;

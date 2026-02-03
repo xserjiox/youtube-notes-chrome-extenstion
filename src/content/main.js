@@ -1,12 +1,17 @@
 import App from './App.svelte';
 import { mount } from 'svelte';
 import { initThumbnailBadges } from './thumbnails/index.js';
+import {
+  BRAND, BRAND_HOVER, BRAND_LIGHT, BRAND_LIGHT_HOVER, ERROR_COLOR,
+  FAB_BG, FAB_BG_HOVER, FAB_ICON_COLOR, FAB_SHADOW,
+} from '../lib/constants.js';
 
 const host = document.createElement('div');
 host.id = 'youtube-notes-root';
 host.style.cssText =
   'all: initial; position: fixed; top: 0; left: 0; z-index: 2147483647; pointer-events: none;' +
-  '--ytn-brand: #1565c0; --ytn-brand-hover: #0d47a1; --ytn-brand-light: #e3f2fd; --ytn-brand-light-hover: #bbdefb; --ytn-error: #e53935;';
+  `--ytn-brand: ${BRAND}; --ytn-brand-hover: ${BRAND_HOVER}; --ytn-brand-light: ${BRAND_LIGHT}; --ytn-brand-light-hover: ${BRAND_LIGHT_HOVER}; --ytn-error: ${ERROR_COLOR};` +
+  `--ytn-fab-bg: ${FAB_BG}; --ytn-fab-bg-hover: ${FAB_BG_HOVER}; --ytn-fab-icon-color: ${FAB_ICON_COLOR}; --ytn-fab-shadow: ${FAB_SHADOW};`;
 document.body.appendChild(host);
 
 const shadow = host.attachShadow({ mode: 'open' });

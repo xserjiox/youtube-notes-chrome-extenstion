@@ -7,7 +7,6 @@
     updateNoteText,
     getAllVideosWithNotes,
     getVideoMeta,
-    setVideoMeta,
   } from '../lib/storage.js';
   import VideoList from '../components/VideoList.svelte';
   import NotesList from '../components/NotesList.svelte';
@@ -145,12 +144,16 @@
     }
   }
 
-  chrome.storage.onChanged.addListener(() => {
-    if (view === 'list') {
-      loadVideos().catch(err => console.error('[YT-Notes] Failed to reload videos:', err));
-    } else if (selectedVideo) {
-      getNotes(selectedVideo.videoId).then((n) => (notes = n)).catch(err => console.error('[YT-Notes] Failed to reload notes:', err));
+  $effect(() => {
+    function handleStorageChange() {
+      if (view === 'list') {
+        loadVideos().catch(err => console.error('[YT-Notes] Failed to reload videos:', err));
+      } else if (selectedVideo) {
+        getNotes(selectedVideo.videoId).then((n) => (notes = n)).catch(err => console.error('[YT-Notes] Failed to reload notes:', err));
+      }
     }
+    chrome.storage.onChanged.addListener(handleStorageChange);
+    return () => chrome.storage.onChanged.removeListener(handleStorageChange);
   });
 
   init();
@@ -190,7 +193,6 @@
       <button class="back-btn" onclick={goBack}>&larr; Back</button>
       <h2 class="video-title">{selectedVideo?.title || selectedVideo?.videoId}</h2>
       {#if selectedVideo?.url}
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <a class="open-youtube-link" href={selectedVideo.url} onclick={(e) => { e.preventDefault(); openOnYouTube(); }}>
           Open on YouTube
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

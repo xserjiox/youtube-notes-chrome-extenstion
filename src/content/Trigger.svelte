@@ -11,11 +11,22 @@
   }
 
   $effect(() => {
+    let playerObserver = null;
+    let observedPlayer = null;
+
     function update() {
       const player = document.querySelector('#movie_player');
       if (!player) {
         visible = false;
         return;
+      }
+
+      // Observe player class changes (ad-showing, theater mode)
+      if (player !== observedPlayer) {
+        playerObserver?.disconnect();
+        playerObserver = new MutationObserver(update);
+        playerObserver.observe(player, { attributes: true, attributeFilter: ['class'] });
+        observedPlayer = player;
       }
 
       if (player.classList.contains('ad-showing')) {
@@ -44,14 +55,34 @@
     }
 
     update();
-    const interval = setInterval(update, 500);
+    // Retry for async player loading
+    const retry1 = setTimeout(update, 1000);
+    const retry2 = setTimeout(update, 3000);
+
+    let rafId = 0;
+    function onScroll() {
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          rafId = 0;
+          update();
+        });
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', update);
     document.addEventListener('fullscreenchange', update);
+    window.addEventListener('yt-navigate-finish', update);
 
     return () => {
-      clearInterval(interval);
+      clearTimeout(retry1);
+      clearTimeout(retry2);
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', update);
       document.removeEventListener('fullscreenchange', update);
+      window.removeEventListener('yt-navigate-finish', update);
+      playerObserver?.disconnect();
     };
   });
 </script>

@@ -9,14 +9,12 @@
   async function loadAll() {
     try {
       videos = await getAllVideosWithNotes();
-      const notesMap = {};
-      for (const v of videos) {
-        notesMap[v.videoId] = await getNotes(v.videoId);
-      }
-      videoNotes = notesMap;
+      const entries = await Promise.all(
+        videos.map(async (v) => [v.videoId, await getNotes(v.videoId)]),
+      );
+      videoNotes = Object.fromEntries(entries);
     } catch (err) {
       console.error('[YT-Notes] Failed to load all data:', err);
-      loading = false;
       videos = [];
       videoNotes = {};
     }
@@ -57,8 +55,12 @@
     window.open(url.toString(), '_blank');
   }
 
-  chrome.storage.onChanged.addListener(() => {
-    loadAll().catch(err => console.error('[YT-Notes] Failed to reload data:', err));
+  $effect(() => {
+    function handleStorageChange() {
+      loadAll().catch(err => console.error('[YT-Notes] Failed to reload data:', err));
+    }
+    chrome.storage.onChanged.addListener(handleStorageChange);
+    return () => chrome.storage.onChanged.removeListener(handleStorageChange);
   });
 
   loadAll().then(() => (loading = false)).catch(err => console.error('[YT-Notes] Failed to initialize:', err));
@@ -100,6 +102,14 @@
     --ytn-brand-light: #e3f2fd;
     --ytn-brand-light-hover: #bbdefb;
     --ytn-error: #e53935;
+    --note-item-border: 1px solid #e8e8e8;
+    --note-item-radius: 8px;
+    --note-item-padding: 10px 12px;
+    --note-item-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --note-item-hover-bg: #f7f7f7;
+    --note-item-hover-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    --note-ts-bg: #cc0000;
+    --note-ts-size: 13px;
   }
 
   main {
@@ -115,41 +125,5 @@
 
   .status {
     color: #666;
-  }
-
-  /* === Global overrides for NoteItem inside page view === */
-  :global(main .note-item) {
-    border: 1px solid #e8e8e8 !important;
-    border-radius: 8px !important;
-    padding: 10px 12px !important;
-    margin-bottom: 8px !important;
-    border-bottom: 1px solid #e8e8e8 !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-    transition: background 0.15s, box-shadow 0.15s;
-  }
-
-  :global(main .note-item.editing) {
-    border: none !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-    background: none !important;
-  }
-
-  :global(main .note-item:not(.editing):hover) {
-    background: #f7f7f7 !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  }
-
-  :global(main .note-item .timestamp) {
-    background: #cc0000 !important;
-    color: #fff !important;
-    border-radius: 6px !important;
-    padding: 3px 10px !important;
-    font-size: 13px !important;
-  }
-
-  :global(main .note-item .edit-btn),
-  :global(main .note-item .delete-btn) {
-    opacity: 1;
   }
 </style>

@@ -1,5 +1,20 @@
 import { generateId } from './utils.js';
 
+// --- Operation serialization ---
+// Prevents race conditions when multiple operations target the same videoId.
+
+const _pending = new Map();
+
+function _serialize(videoId, fn) {
+  const prev = _pending.get(videoId) ?? Promise.resolve();
+  const next = prev.then(fn, fn);
+  _pending.set(videoId, next);
+  next.finally(() => {
+    if (_pending.get(videoId) === next) _pending.delete(videoId);
+  });
+  return next;
+}
+
 // --- Notes ---
 
 export async function getNotes(videoId) {
@@ -8,62 +23,66 @@ export async function getNotes(videoId) {
   return result[key] || [];
 }
 
-export async function addNote(videoId, text, timestamp = null) {
-  const key = `notes:${videoId}`;
-  const notes = await getNotes(videoId);
-  const note = {
-    id: generateId(),
-    text,
-    timestamp,
-    createdAt: Date.now(),
-  };
-  notes.unshift(note);
-  await chrome.storage.local.set({ [key]: notes });
+export function addNote(videoId, text, timestamp = null) {
+  return _serialize(videoId, async () => {
+    const key = `notes:${videoId}`;
+    const notes = await getNotes(videoId);
+    const note = {
+      id: generateId(),
+      text,
+      timestamp,
+      createdAt: Date.now(),
+    };
+    notes.unshift(note);
+    await chrome.storage.local.set({ [key]: notes });
 
-  // Update meta
-  const meta = await getVideoMeta(videoId);
-  await setVideoMeta(videoId, {
-    ...meta,
-    noteCount: notes.length,
-    updatedAt: Date.now(),
-  });
-
-  return note;
-}
-
-export async function deleteNote(videoId, noteId) {
-  const key = `notes:${videoId}`;
-  let notes = await getNotes(videoId);
-  notes = notes.filter((n) => n.id !== noteId);
-  await chrome.storage.local.set({ [key]: notes });
-
-  const meta = await getVideoMeta(videoId);
-  if (notes.length === 0) {
-    // Remove meta and notes keys when no notes left
-    await chrome.storage.local.remove([key, `meta:${videoId}`]);
-  } else {
+    const meta = await getVideoMeta(videoId);
     await setVideoMeta(videoId, {
       ...meta,
       noteCount: notes.length,
       updatedAt: Date.now(),
     });
-  }
 
-  return notes;
+    return note;
+  });
 }
 
-export async function updateNoteText(videoId, noteId, newText) {
-  const key = `notes:${videoId}`;
-  const notes = await getNotes(videoId);
-  const note = notes.find((n) => n.id === noteId);
-  if (!note) return notes;
-  note.text = newText;
-  await chrome.storage.local.set({ [key]: notes });
+export function deleteNote(videoId, noteId) {
+  return _serialize(videoId, async () => {
+    const key = `notes:${videoId}`;
+    let notes = await getNotes(videoId);
+    notes = notes.filter((n) => n.id !== noteId);
 
-  const meta = await getVideoMeta(videoId);
-  await setVideoMeta(videoId, { ...meta, updatedAt: Date.now() });
+    if (notes.length === 0) {
+      await chrome.storage.local.remove([key, `meta:${videoId}`]);
+    } else {
+      await chrome.storage.local.set({ [key]: notes });
+      const meta = await getVideoMeta(videoId);
+      await setVideoMeta(videoId, {
+        ...meta,
+        noteCount: notes.length,
+        updatedAt: Date.now(),
+      });
+    }
 
-  return notes;
+    return notes;
+  });
+}
+
+export function updateNoteText(videoId, noteId, newText) {
+  return _serialize(videoId, async () => {
+    const key = `notes:${videoId}`;
+    const notes = await getNotes(videoId);
+    const note = notes.find((n) => n.id === noteId);
+    if (!note) return notes;
+    note.text = newText;
+    await chrome.storage.local.set({ [key]: notes });
+
+    const meta = await getVideoMeta(videoId);
+    await setVideoMeta(videoId, { ...meta, updatedAt: Date.now() });
+
+    return notes;
+  });
 }
 
 // --- Video Meta ---
@@ -76,10 +95,8 @@ export async function getVideoMeta(videoId) {
 
 export async function setVideoMeta(videoId, meta) {
   const key = `meta:${videoId}`;
-  const existing = await chrome.storage.local.get(key);
-  const prev = existing[key] || {};
   await chrome.storage.local.set({
-    [key]: { videoId, ...meta, createdAt: prev.createdAt || Date.now() },
+    [key]: { videoId, ...meta, createdAt: meta.createdAt || Date.now() },
   });
 }
 

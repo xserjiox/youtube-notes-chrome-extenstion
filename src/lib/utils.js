@@ -35,7 +35,7 @@ export function formatTimestamp(seconds) {
 export function parseTimestamp(str) {
   if (!str) return null;
   const parts = str.split(':').map(Number);
-  if (parts.some(isNaN)) return null;
+  if (parts.some((n) => isNaN(n) || !Number.isInteger(n))) return null;
   if (parts.length === 2) {
     const [m, s] = parts;
     if (s < 0 || s >= 60 || m < 0) return null;

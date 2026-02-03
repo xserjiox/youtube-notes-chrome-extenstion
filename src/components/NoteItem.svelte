@@ -95,19 +95,23 @@
 
 <style>
   .note-item {
-    padding: 14px 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    transition: background 0.15s;
+    padding: var(--note-item-padding, 14px 16px);
+    border: var(--note-item-border, 1px solid #e0e0e0);
+    border-radius: var(--note-item-radius, 10px);
+    box-shadow: var(--note-item-shadow, none);
+    transition: background 0.15s, box-shadow 0.15s;
   }
 
   .note-item.editing {
     border-color: transparent;
     padding: 0;
+    box-shadow: none;
+    background: none;
   }
 
   .note-item:not(.editing):hover {
-    background: #f5f5f5;
+    background: var(--note-item-hover-bg, #f5f5f5);
+    box-shadow: var(--note-item-hover-shadow, none);
   }
 
   .note-content {
@@ -145,12 +149,12 @@
 
   .timestamp {
     display: inline-block;
-    background: #c62828;
+    background: var(--note-ts-bg, #c62828);
     color: white;
-    font-size: 12px;
+    font-size: var(--note-ts-size, 12px);
     font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 6px;
+    padding: var(--note-ts-padding, 3px 10px);
+    border-radius: var(--note-ts-radius, 6px);
     margin-right: 8px;
     font-family: monospace;
   }
@@ -237,7 +241,7 @@
   }
 
   .delete-btn:hover {
-    background: var(--ytn-error);
+    background: var(--ytn-error, #e53935);
     color: #fff;
   }
 </style>

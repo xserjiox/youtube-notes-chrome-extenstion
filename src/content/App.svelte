@@ -14,15 +14,13 @@
   let currentTimestamp = $state(null);
   let videoDuration = $state(null);
   let adPlaying = $state(false);
-  let lastKnownPosition = null;
+  let lastKnownPosition = 0;
 
   // External (thumbnail) mode state
   let externalVideoId = $state(null);
   let externalTitle = $state(null);
   let externalMode = $derived(externalVideoId !== null);
   let effectiveVideoId = $derived(externalVideoId ?? videoId);
-
-  const POSITION_POLL_MS = 1000;
 
   function getVideoElement() {
     return document.querySelector('video');
@@ -94,7 +92,6 @@
 
       // Reload notes for the effective video
       notes = await getNotes(effectiveVideoId);
-      noteCount = externalMode ? noteCount : notes.length;
       if (!externalMode) noteCount = notes.length;
     } catch (err) {
       console.error('[YT-Notes] Failed to save note:', err);
@@ -179,7 +176,10 @@
       characterData: true,
     });
 
-    const handleNavigate = () => onNavigate();
+    const handleNavigate = () => {
+      onNavigate();
+      trackVideo();
+    };
     window.addEventListener('yt-navigate-finish', handleNavigate);
 
     const handleStorageChange = (changes) => {
@@ -189,12 +189,26 @@
     };
     chrome.storage.onChanged.addListener(handleStorageChange);
 
-    const positionInterval = setInterval(() => {
-      if (videoId && !isAdPlaying()) {
-        const video = getVideoElement();
-        if (video) lastKnownPosition = Math.floor(video.currentTime);
+    // Track video position via timeupdate event instead of polling
+    function handleTimeUpdate(e) {
+      if (!isAdPlaying()) {
+        lastKnownPosition = Math.floor(e.target.currentTime);
       }
-    }, POSITION_POLL_MS);
+    }
+
+    let trackedVideo = null;
+    function trackVideo() {
+      const video = getVideoElement();
+      if (video === trackedVideo) return;
+      trackedVideo?.removeEventListener('timeupdate', handleTimeUpdate);
+      trackedVideo = video;
+      video?.addEventListener('timeupdate', handleTimeUpdate);
+    }
+
+    trackVideo();
+    // Retry in case video element loads asynchronously
+    const videoRetry1 = setTimeout(trackVideo, 1000);
+    const videoRetry2 = setTimeout(trackVideo, 3000);
 
     // Listen for external open/close events (from thumbnail buttons)
     window.addEventListener(OPEN_NOTES_EVENT, handleExternalOpen);
@@ -205,25 +219,50 @@
 
     return () => {
       observer.disconnect();
+      trackedVideo?.removeEventListener('timeupdate', handleTimeUpdate);
+      clearTimeout(videoRetry1);
+      clearTimeout(videoRetry2);
       window.removeEventListener('yt-navigate-finish', handleNavigate);
       chrome.storage.onChanged.removeListener(handleStorageChange);
-      clearInterval(positionInterval);
       window.removeEventListener(OPEN_NOTES_EVENT, handleExternalOpen);
       window.removeEventListener(CLOSE_NOTES_EVENT, handleExternalClose);
     };
   });
 
-  // Set timestamp on modal open; update duration while open
+  // Update duration and ad state while modal is open
   $effect(() => {
     if (open && !externalMode) {
       currentTimestamp = getVideoTimestamp();
       videoDuration = getVideoDuration();
       adPlaying = isAdPlaying();
-      const interval = setInterval(() => {
+
+      const video = getVideoElement();
+      const player = getPlayerElement();
+
+      // Listen for duration changes on the video element
+      function handleDurationChange() {
         videoDuration = getVideoDuration();
-        adPlaying = isAdPlaying();
-      }, 1000);
-      return () => clearInterval(interval);
+      }
+
+      // Observe player class changes for ad state
+      let playerObserver = null;
+      if (player) {
+        playerObserver = new MutationObserver(() => {
+          adPlaying = isAdPlaying();
+        });
+        playerObserver.observe(player, { attributes: true, attributeFilter: ['class'] });
+      }
+
+      if (video) {
+        video.addEventListener('durationchange', handleDurationChange);
+      }
+
+      return () => {
+        playerObserver?.disconnect();
+        if (video) {
+          video.removeEventListener('durationchange', handleDurationChange);
+        }
+      };
     }
   });
 </script>

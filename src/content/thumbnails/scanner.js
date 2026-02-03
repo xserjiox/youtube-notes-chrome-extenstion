@@ -39,7 +39,7 @@ function scanPage() {
     thumbView.setAttribute(PROCESSED_ATTR, videoId);
     thumbView.style.position = 'relative';
 
-    thumbView.appendChild(createNoteButton(videoId, thumbView));
+    thumbView.appendChild(createNoteButton(videoId));
     updateBadge(thumbView, videoId);
   }
 }
