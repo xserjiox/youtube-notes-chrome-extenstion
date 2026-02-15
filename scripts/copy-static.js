@@ -8,5 +8,6 @@ const dist = join(root, 'dist');
 
 cpSync(join(root, 'manifest.json'), join(dist, 'manifest.json'));
 cpSync(join(root, 'public', 'icons'), join(dist, 'icons'), { recursive: true });
+cpSync(join(root, '_locales'), join(dist, '_locales'), { recursive: true });
 
 console.log('Static files copied to dist/');
