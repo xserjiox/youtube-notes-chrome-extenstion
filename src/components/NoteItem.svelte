@@ -73,9 +73,7 @@
         {' '}<button class="toggle-btn" onclick={() => expanded = !expanded}>{expanded ? 'Show less' : 'Show more'}</button>{/if}</span>
       <div class="note-footer">
         {#if note.timestamp != null}
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <span class="timestamp" onclick={() => onseek?.(note.timestamp)}>{formatTimestamp(note.timestamp)}</span>
+          <button type="button" class="timestamp" onclick={() => onseek?.(note.timestamp)}>{formatTimestamp(note.timestamp)}</button>
         {/if}
         <div class="note-actions">
           <button class="edit-btn" onclick={(e) => { e.stopPropagation(); startEdit(); }} title="Edit note">
@@ -155,6 +153,7 @@
     font-weight: 600;
     padding: var(--note-ts-padding, 3px 8px);
     border-radius: var(--note-ts-radius, 6px);
+    border: none;
     font-family: monospace;
     line-height: 1;
     cursor: pointer;

@@ -75,11 +75,9 @@
   <div class="actions-row">
     {#if showTimestampToggle}
       <div class="timestamp-section">
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="toggle-track" class:active={useTimestamp} onclick={() => (useTimestamp = !useTimestamp)}>
+        <button type="button" class="toggle-track" class:active={useTimestamp} role="switch" aria-checked={useTimestamp} aria-label="Toggle timestamp" onclick={() => (useTimestamp = !useTimestamp)}>
           <div class="toggle-thumb"></div>
-        </div>
+        </button>
         <svg class="clock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/>
           <polyline points="12 6 12 12 16 14"/>
@@ -99,9 +97,7 @@
                 onblur={confirmTs}
               />)
             {:else}
-              <!-- svelte-ignore a11y_click_events_have_key_events -->
-              <!-- svelte-ignore a11y_no_static_element_interactions -->
-              <span class="timestamp-time" onclick={startTsEdit}>({formatTimestamp(timestamp)})</span>
+              <button type="button" class="timestamp-time" onclick={startTsEdit}>({formatTimestamp(timestamp)})</button>
             {/if}
           {/if}
         </span>
@@ -165,6 +161,8 @@
     height: 20px;
     border-radius: 10px;
     background: #ccc;
+    border: none;
+    padding: 0;
     position: relative;
     cursor: pointer;
     transition: background 0.2s;
@@ -205,6 +203,12 @@
   .timestamp-time {
     cursor: pointer;
     font-weight: 600;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
   }
 
   .timestamp-time:hover {

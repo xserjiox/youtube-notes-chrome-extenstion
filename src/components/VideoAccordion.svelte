@@ -23,9 +23,7 @@
 </script>
 
 <section class="accordion" class:collapsed={!expanded}>
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <div class="accordion-top" onclick={toggle}>
+  <div class="accordion-top" onclick={toggle} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }}} role="button" tabindex="0">
     <div class="accordion-header">
       <svg class="chevron" class:rotated={!expanded} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="6 9 12 15 18 9"/>
