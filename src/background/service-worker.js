@@ -3,9 +3,7 @@
 import { parseVideoId } from '../lib/utils.js';
 import { BRAND } from '../lib/constants.js';
 
-chrome.runtime.onInstalled.addListener(() => {
-  console.log('YouTube Notes extension installed');
-});
+chrome.runtime.onInstalled.addListener(() => {});
 
 // Update badge when storage changes
 chrome.storage.onChanged.addListener((changes) => {
