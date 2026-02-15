@@ -1,4 +1,6 @@
 <script>
+  import { getThumbnailUrl } from '../lib/utils.js';
+
   let { video, onclick } = $props();
 
   function getRelativeTime(timestamp) {
@@ -24,6 +26,7 @@
 </script>
 
 <button class="video-entry" onclick={() => onclick(video)}>
+  <img class="thumbnail" src={getThumbnailUrl(video.videoId)} alt="" />
   <div class="video-info">
     <span class="video-title">{video.title || video.videoId}</span>
     <div class="video-meta">
@@ -61,6 +64,15 @@
   .video-entry:hover {
     border-color: #ccc;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .thumbnail {
+    flex-shrink: 0;
+    width: 80px;
+    height: 45px;
+    border-radius: 6px;
+    object-fit: cover;
+    margin-right: 10px;
   }
 
   .video-info {

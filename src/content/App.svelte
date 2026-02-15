@@ -50,7 +50,7 @@
     const el =
       document.querySelector('h1.ytd-watch-metadata yt-formatted-string') ||
       document.querySelector('h1.ytd-video-primary-info-renderer');
-    return el?.textContent?.trim() || document.title.replace(' - YouTube', '').trim();
+    return el?.textContent?.trim() || document.title.replace(' - YouTube', '').replace(/^\(\d+\)\s*/, '').trim();
   }
 
   async function loadNotes() {

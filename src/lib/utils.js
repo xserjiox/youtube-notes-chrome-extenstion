@@ -50,6 +50,13 @@ export function parseTimestamp(str) {
 }
 
 /**
+ * Build a YouTube thumbnail URL from a video ID.
+ */
+export function getThumbnailUrl(videoId) {
+  return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+}
+
+/**
  * Generate a short random ID.
  */
 export function generateId() {

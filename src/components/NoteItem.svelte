@@ -1,10 +1,14 @@
 <script>
   import { formatTimestamp } from '../lib/utils.js';
 
-  let { note, ondelete, onseek, onedit } = $props();
+  let { note, ondelete, onseek, onedit, maxLength = 0 } = $props();
 
   let editing = $state(false);
   let editText = $state('');
+  let expanded = $state(false);
+
+  let isTruncated = $derived(maxLength > 0 && note.text.length > maxLength);
+  let displayText = $derived(isTruncated && !expanded ? note.text.slice(0, maxLength) + '...' : note.text);
 
   function startEdit() {
     editText = note.text;
@@ -64,22 +68,24 @@
       </div>
     </div>
   {:else}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="note-content" class:clickable={note.timestamp != null} onclick={() => note.timestamp != null && onseek?.(note.timestamp)}>
-      <div class="note-header">
+    <div class="note-content">
+      <span class="text">{displayText}{#if isTruncated}
+        {' '}<button class="toggle-btn" onclick={() => expanded = !expanded}>{expanded ? 'Show less' : 'Show more'}</button>{/if}</span>
+      <div class="note-footer">
         {#if note.timestamp != null}
-          <span class="timestamp">{formatTimestamp(note.timestamp)}</span>
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <span class="timestamp" onclick={() => onseek?.(note.timestamp)}>{formatTimestamp(note.timestamp)}</span>
         {/if}
         <div class="note-actions">
           <button class="edit-btn" onclick={(e) => { e.stopPropagation(); startEdit(); }} title="Edit note">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 3a2.85 2.85 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
               <path d="m15 5 4 4"/>
             </svg>
           </button>
           <button class="delete-btn" onclick={(e) => { e.stopPropagation(); ondelete(note.id); }} title="Delete note">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"/>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
               <line x1="10" y1="11" x2="10" y2="17"/>
@@ -88,7 +94,6 @@
           </button>
         </div>
       </div>
-      <span class="text">{note.text}</span>
     </div>
   {/if}
 </div>
@@ -115,25 +120,21 @@
   }
 
   .note-content {
-    min-width: 0;
-    word-break: break-word;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  .note-content.clickable {
-    cursor: pointer;
-  }
-
-  .note-header {
+  .note-footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
   }
 
   .note-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
+    margin-left: auto;
   }
 
   .edit-card {
@@ -148,20 +149,41 @@
   }
 
   .timestamp {
-    display: inline-block;
     background: var(--note-ts-bg, #c62828);
     color: white;
-    font-size: var(--note-ts-size, 12px);
+    font-size: var(--note-ts-size, 11px);
     font-weight: 600;
-    padding: var(--note-ts-padding, 3px 10px);
+    padding: var(--note-ts-padding, 3px 8px);
     border-radius: var(--note-ts-radius, 6px);
-    margin-right: 8px;
     font-family: monospace;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .timestamp:hover {
+    opacity: 0.85;
   }
 
   .text {
     font-size: 13px;
     color: #1a1a1a;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  .toggle-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #1a73e8;
+    font-size: inherit;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline;
+  }
+
+  .toggle-btn:hover {
+    text-decoration: underline;
   }
 
   .edit-textarea {

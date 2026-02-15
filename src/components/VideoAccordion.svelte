@@ -1,6 +1,7 @@
 <script>
   import NoteInput from './NoteInput.svelte';
   import NotesList from './NotesList.svelte';
+  import { getThumbnailUrl } from '../lib/utils.js';
 
   let { video, notes, onaddnote, ondeletenote, oneditnote, onseek } = $props();
 
@@ -29,6 +30,7 @@
       <svg class="chevron" class:rotated={!expanded} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="6 9 12 15 18 9"/>
       </svg>
+      <img class="thumbnail" src={getThumbnailUrl(video.videoId)} alt="" />
       <div class="header-info">
         <h2 class="video-title">{video.title || video.videoId}</h2>
       </div>
@@ -112,6 +114,14 @@
 
   .chevron.rotated {
     transform: rotate(-90deg);
+  }
+
+  .thumbnail {
+    flex-shrink: 0;
+    width: 120px;
+    height: 68px;
+    border-radius: 8px;
+    object-fit: cover;
   }
 
   .header-info {

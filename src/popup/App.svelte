@@ -205,7 +205,7 @@
 
       <div class="notes-content">
         <NoteInput onsave={handleSave} />
-        <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={handleSeek} onedit={handleEdit} />
+        <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={handleSeek} onedit={handleEdit} maxLength={200} />
       </div>
     </div>
   {/if}
