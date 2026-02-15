@@ -1,5 +1,6 @@
 <script>
   import { getThumbnailUrl } from '../lib/utils.js';
+  import { msg, plural } from '../lib/i18n.js';
 
   let { video, onclick } = $props();
 
@@ -12,16 +13,16 @@
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
-    if (seconds < 60) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
+    if (seconds < 60) return msg('videoEntry_justNow');
+    if (minutes < 60) return msg('videoEntry_minutesAgo', minutes);
+    if (hours < 24) return msg('videoEntry_hoursAgo', hours);
+    if (days < 7) return msg('videoEntry_daysAgo', days);
     const weeks = Math.floor(days / 7);
-    if (weeks < 5) return `${weeks}w ago`;
+    if (weeks < 5) return msg('videoEntry_weeksAgo', weeks);
     const months = Math.floor(days / 30);
-    if (months < 12) return `${months}mo ago`;
+    if (months < 12) return msg('videoEntry_monthsAgo', months);
     const years = Math.floor(days / 365);
-    return `${years}y ago`;
+    return msg('videoEntry_yearsAgo', years);
   }
 </script>
 
@@ -38,7 +39,7 @@
         <line x1="16" y1="13" x2="8" y2="13"/>
         <line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
-      <span class="meta-notes">{video.noteCount} note{video.noteCount === 1 ? '' : 's'}</span>
+      <span class="meta-notes">{plural('notesList_count', video.noteCount)}</span>
     </div>
   </div>
   <span class="badge">{video.noteCount}</span>
@@ -54,7 +55,7 @@
     border-radius: 8px;
     background: #fff;
     cursor: pointer;
-    text-align: left;
+    text-align: start;
     font-family: inherit;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     transition: box-shadow 0.15s, border-color 0.15s;
@@ -72,7 +73,7 @@
     height: 45px;
     border-radius: 6px;
     object-fit: cover;
-    margin-right: 10px;
+    margin-inline-end: 10px;
   }
 
   .video-info {
@@ -118,6 +119,6 @@
     font-size: 12px;
     font-weight: 600;
     border-radius: 12px;
-    margin-left: 10px;
+    margin-inline-start: 10px;
   }
 </style>

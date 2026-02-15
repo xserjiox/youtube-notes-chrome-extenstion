@@ -1,11 +1,12 @@
 <script>
   import NoteItem from './NoteItem.svelte';
+  import { msg, plural } from '../lib/i18n.js';
 
   let { notes, expanded = true, ondelete, onseek, onedit, maxLength = 0 } = $props();
 </script>
 
 {#if notes.length === 0}
-  <p class="empty">No notes yet.</p>
+  <p class="empty">{msg('notesList_empty')}</p>
 {:else}
   {#if expanded}
     <div class="notes-list">
@@ -14,7 +15,7 @@
       {/each}
     </div>
   {:else}
-    <p class="collapsed-count">{notes.length} note{notes.length === 1 ? '' : 's'}</p>
+    <p class="collapsed-count">{plural('notesList_count', notes.length)}</p>
   {/if}
 {/if}
 

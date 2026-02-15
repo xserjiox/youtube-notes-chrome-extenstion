@@ -1,5 +1,6 @@
 <script>
   import { formatTimestamp, parseTimestamp } from '../lib/utils.js';
+  import { msg } from '../lib/i18n.js';
 
   let { onsave, timestamp = $bindable(null), duration = null, adPlaying = false, showTimestampToggle = false } = $props();
 
@@ -67,7 +68,7 @@
 <div class="note-input">
   <textarea
     bind:value={text}
-    placeholder="Write your note here..."
+    placeholder={msg('noteInput_placeholder')}
     rows="3"
     onkeydown={handleKeydown}
   ></textarea>
@@ -75,7 +76,7 @@
   <div class="actions-row">
     {#if showTimestampToggle}
       <div class="timestamp-section">
-        <button type="button" class="toggle-track" class:active={useTimestamp} role="switch" aria-checked={useTimestamp} aria-label="Toggle timestamp" onclick={() => (useTimestamp = !useTimestamp)}>
+        <button type="button" class="toggle-track" class:active={useTimestamp} role="switch" aria-checked={useTimestamp} aria-label={msg('noteInput_toggleTimestamp')} onclick={() => (useTimestamp = !useTimestamp)}>
           <div class="toggle-thumb"></div>
         </button>
         <svg class="clock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -83,7 +84,7 @@
           <polyline points="12 6 12 12 16 14"/>
         </svg>
         <span class="timestamp-label">
-          Add timestamp
+          {msg('noteInput_addTimestamp')}
           {#if useTimestamp && timestamp != null}
             {#if editingTimestamp}
               (<input
@@ -92,7 +93,7 @@
                 class="ts-inline-input"
                 class:invalid={tsError}
                 style="width: {(tsInputText.length || 4)}ch"
-                placeholder="0:00"
+                placeholder={msg('noteInput_timestampPlaceholder')}
                 onkeydown={handleTsKeydown}
                 onblur={confirmTs}
               />)
@@ -110,7 +111,7 @@
         <polyline points="17 21 17 13 7 13 7 21"/>
         <polyline points="7 3 7 8 15 8"/>
       </svg>
-      Save Note
+      {msg('noteInput_saveNote')}
     </button>
   </div>
 </div>

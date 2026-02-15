@@ -1,6 +1,7 @@
 import App from './App.svelte';
 import { mount } from 'svelte';
 import { initThumbnailBadges } from './thumbnails/index.js';
+import { initLocale } from '../lib/i18n.js';
 import {
   BRAND, BRAND_HOVER, BRAND_LIGHT, BRAND_LIGHT_HOVER, ERROR_COLOR,
   FAB_BG, FAB_BG_HOVER, FAB_ICON_COLOR, FAB_SHADOW,
@@ -21,6 +22,8 @@ for (const evt of ['keydown', 'keyup', 'keypress']) {
   host.addEventListener(evt, (e) => e.stopPropagation());
 }
 
-mount(App, { target: shadow });
+initLocale().then(() => {
+  mount(App, { target: shadow });
+});
 
 initThumbnailBadges();

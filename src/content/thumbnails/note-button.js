@@ -1,12 +1,13 @@
 import { parseVideoId } from '../../lib/utils.js';
 import { OPEN_NOTES_EVENT } from '../../lib/constants.js';
+import { msg } from '../../lib/i18n.js';
 import { extractVideoTitle } from './title-extractor.js';
 import { BTN_CLASS, PREVIEW_BTN_CLASS, createNoteIcon } from './styles.js';
 
 function createButton(className, videoId) {
   const btn = document.createElement('button');
   btn.className = className;
-  btn.title = 'Notes';
+  btn.title = msg('thumbnail_notes');
   btn.appendChild(createNoteIcon(14, 2));
 
   btn.addEventListener('click', (e) => {

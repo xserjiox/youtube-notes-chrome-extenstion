@@ -2,6 +2,7 @@
   import NoteInput from './NoteInput.svelte';
   import NotesList from './NotesList.svelte';
   import { getThumbnailUrl } from '../lib/utils.js';
+  import { msg, plural } from '../lib/i18n.js';
 
   let { video, notes, onaddnote, ondeletenote, oneditnote, onseek } = $props();
 
@@ -43,11 +44,11 @@
             <polyline points="15 3 21 3 21 9"/>
             <line x1="10" y1="14" x2="21" y2="3"/>
           </svg>
-          Open on YouTube
+          {msg('common_openOnYouTube')}
         </a>
       {/if}
       <span class="meta-separator">·</span>
-      <span class="meta-count">{notes.length} note{notes.length === 1 ? '' : 's'}</span>
+      <span class="meta-count">{plural('notesList_count', notes.length)}</span>
     </div>
   </div>
 
@@ -58,7 +59,7 @@
           <line x1="12" y1="5" x2="12" y2="19"/>
           <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
-        Add Note
+        {msg('videoAccordion_addNote')}
       </button>
 
       {#if showInput}
@@ -158,11 +159,13 @@
     align-items: center;
     gap: 6px;
     font-size: 13px;
-    padding: 6px 20px 14px 48px;
+    padding: 6px 20px 14px;
+    padding-inline-start: 48px;
   }
 
   .accordion-body {
-    padding: 16px 20px 16px 48px;
+    padding: 16px 20px 16px;
+    padding-inline-start: 48px;
   }
 
   .youtube-link {

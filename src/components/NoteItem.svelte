@@ -1,5 +1,6 @@
 <script>
   import { formatTimestamp } from '../lib/utils.js';
+  import { msg } from '../lib/i18n.js';
 
   let { note, ondelete, onseek, onedit, maxLength = 0 } = $props();
 
@@ -56,33 +57,33 @@
             <polyline points="17 21 17 13 7 13 7 21"/>
             <polyline points="7 3 7 8 15 8"/>
           </svg>
-          Save
+          {msg('common_save')}
         </button>
         <button class="cancel-btn" onclick={cancelEdit}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/>
             <line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
-          Cancel
+          {msg('common_cancel')}
         </button>
       </div>
     </div>
   {:else}
     <div class="note-content">
       <span class="text">{displayText}{#if isTruncated}
-        {' '}<button class="toggle-btn" onclick={() => expanded = !expanded}>{expanded ? 'Show less' : 'Show more'}</button>{/if}</span>
+        &nbsp;<button class="toggle-btn" onclick={() => expanded = !expanded}>{expanded ? msg('noteItem_showLess') : msg('noteItem_showMore')}</button>{/if}</span>
       <div class="note-footer">
         {#if note.timestamp != null}
           <button type="button" class="timestamp" onclick={() => onseek?.(note.timestamp)}>{formatTimestamp(note.timestamp)}</button>
         {/if}
         <div class="note-actions">
-          <button class="edit-btn" onclick={(e) => { e.stopPropagation(); startEdit(); }} title="Edit note">
+          <button class="edit-btn" onclick={(e) => { e.stopPropagation(); startEdit(); }} title={msg('noteItem_editTitle')}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 3a2.85 2.85 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
               <path d="m15 5 4 4"/>
             </svg>
           </button>
-          <button class="delete-btn" onclick={(e) => { e.stopPropagation(); ondelete(note.id); }} title="Delete note">
+          <button class="delete-btn" onclick={(e) => { e.stopPropagation(); ondelete(note.id); }} title={msg('noteItem_deleteTitle')}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"/>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -132,7 +133,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    margin-left: auto;
+    margin-inline-start: auto;
   }
 
   .edit-card {

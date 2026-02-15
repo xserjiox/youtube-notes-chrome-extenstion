@@ -1,11 +1,12 @@
 <script>
   import VideoEntry from './VideoEntry.svelte';
+  import { msg } from '../lib/i18n.js';
 
   let { videos, onselect } = $props();
 </script>
 
 {#if videos.length === 0}
-  <p class="empty">No videos with notes yet.</p>
+  <p class="empty">{msg('videoList_empty')}</p>
 {:else}
   <div class="video-list">
     {#each videos as video (video.videoId)}

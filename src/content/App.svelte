@@ -2,6 +2,7 @@
   import { parseVideoId } from '../lib/utils.js';
   import { OPEN_NOTES_EVENT, CLOSE_NOTES_EVENT } from '../lib/constants.js';
   import { getNotes, addNote, deleteNote, updateNoteText, getVideoMeta, setVideoMeta } from '../lib/storage.js';
+  import { msg } from '../lib/i18n.js';
   import Trigger from './Trigger.svelte';
   import Overlay from './Overlay.svelte';
   import NotesList from '../components/NotesList.svelte';
@@ -272,7 +273,7 @@
 {/if}
 
 {#if open && effectiveVideoId}
-  <Overlay onclose={handleClose} title={externalMode ? externalTitle : 'Video Notes'}>
+  <Overlay onclose={handleClose} title={externalMode ? externalTitle : msg('common_videoNotes')}>
     <NoteInput
       onsave={handleSave}
       bind:timestamp={currentTimestamp}

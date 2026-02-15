@@ -1,7 +1,11 @@
 <script>
-  let { onclose, children, title = 'Video Notes' } = $props();
+  import { msg, isRTL } from '../lib/i18n.js';
+
+  let { onclose, children, title = undefined } = $props();
 
   let mousedownOnBackdrop = false;
+  let resolvedTitle = $derived(title ?? msg('common_videoNotes'));
+  let dir = $derived(isRTL() ? 'rtl' : 'ltr');
 
   function handleMousedown(e) {
     mousedownOnBackdrop = e.target === e.currentTarget;
@@ -26,16 +30,16 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="backdrop" onmousedown={handleMousedown} onclick={handleBackdrop}>
-  <div class="modal">
+  <div class="modal" {dir}>
     <div class="modal-header">
-      <h2>{title}</h2>
+      <h2>{resolvedTitle}</h2>
       <button class="close-btn" onclick={onclose}>&times;</button>
     </div>
     <div class="modal-body">
       {@render children()}
     </div>
     <div class="modal-footer">
-      Press Esc to close &bull; Click outside to dismiss
+      {msg('overlay_footer')}
     </div>
   </div>
 </div>
@@ -91,7 +95,7 @@
     padding: 0 4px;
     line-height: 1;
     flex-shrink: 0;
-    margin-left: 8px;
+    margin-inline-start: 8px;
   }
 
   .close-btn:hover {

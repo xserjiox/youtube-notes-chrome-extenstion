@@ -1,10 +1,21 @@
 <script>
   import { getAllVideosWithNotes, getNotes, addNote, deleteNote, updateNoteText } from '../lib/storage.js';
+  import { msg, currentLocale, setLocale, onLocaleChange, isRTL } from '../lib/i18n.js';
+  import { LOCALE_LABELS } from '../lib/locales/index.js';
   import VideoAccordion from '../components/VideoAccordion.svelte';
 
   let videos = $state([]);
   let videoNotes = $state({});
   let loading = $state(true);
+  let locale = $state(currentLocale());
+  let dir = $state(isRTL() ? 'rtl' : 'ltr');
+
+  $effect(() => {
+    return onLocaleChange((code) => {
+      locale = code;
+      dir = isRTL() ? 'rtl' : 'ltr';
+    });
+  });
 
   async function loadAll() {
     try {
@@ -55,6 +66,10 @@
     window.open(url.toString(), '_blank');
   }
 
+  function handleLocaleChange(e) {
+    setLocale(e.target.value);
+  }
+
   $effect(() => {
     function handleStorageChange() {
       loadAll().catch(err => console.error('[YT-Notes] Failed to reload data:', err));
@@ -66,25 +81,36 @@
   loadAll().then(() => (loading = false)).catch(err => console.error('[YT-Notes] Failed to initialize:', err));
 </script>
 
-<main>
-  <h1>YouTube Notes</h1>
+<main {dir}>
+  <div class="header">
+    <h1>{msg('common_youtubeNotes')}</h1>
+    <div class="locale-select-wrapper">
+      <select id="locale-select" class="locale-select" value={locale} onchange={handleLocaleChange} autocomplete="off">
+        {#each Object.entries(LOCALE_LABELS) as [code, label] (code)}
+          <option value={code} selected={code === locale}>{label}</option>
+        {/each}
+      </select>
+    </div>
+  </div>
 
-  {#if loading}
-    <p class="status">Loading...</p>
-  {:else if videos.length === 0}
-    <p class="status">No notes yet. Open a YouTube video and start adding notes!</p>
-  {:else}
-    {#each videos as video (video.videoId)}
-      <VideoAccordion
-        {video}
-        notes={videoNotes[video.videoId] || []}
-        onaddnote={handleAddNote}
-        ondeletenote={handleDelete}
-        oneditnote={handleEdit}
-        onseek={handleSeek}
-      />
-    {/each}
-  {/if}
+  {#key locale}
+    {#if loading}
+      <p class="status">{msg('common_loading')}</p>
+    {:else if videos.length === 0}
+      <p class="status">{msg('page_emptyState')}</p>
+    {:else}
+      {#each videos as video (video.videoId)}
+        <VideoAccordion
+          {video}
+          notes={videoNotes[video.videoId] || []}
+          onaddnote={handleAddNote}
+          ondeletenote={handleDelete}
+          oneditnote={handleEdit}
+          onseek={handleSeek}
+        />
+      {/each}
+    {/if}
+  {/key}
 </main>
 
 <style>
@@ -118,9 +144,52 @@
     padding: 32px 24px;
   }
 
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
   h1 {
     font-size: 24px;
-    margin: 0 0 24px;
+    margin: 0;
+  }
+
+  .locale-select-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .locale-select-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 55%;
+    inset-inline-end: 10px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #666;
+    pointer-events: none;
+  }
+
+  .locale-select {
+    appearance: none;
+    padding: 6px 10px;
+    padding-inline-end: 28px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+  }
+
+  .locale-select:hover {
+    border-color: #bbb;
   }
 
   .status {

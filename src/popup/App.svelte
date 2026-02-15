@@ -8,6 +8,7 @@
     getAllVideosWithNotes,
     getVideoMeta,
   } from '../lib/storage.js';
+  import { msg, isRTL } from '../lib/i18n.js';
   import VideoList from '../components/VideoList.svelte';
   import NotesList from '../components/NotesList.svelte';
   import NoteInput from '../components/NoteInput.svelte';
@@ -18,6 +19,7 @@
   let notes = $state([]);
   let loading = $state(true);
   let currentVideoId = $state(null);
+  let dir = $derived(isRTL() ? 'rtl' : 'ltr');
 
   async function getCurrentTabVideoId() {
     try {
@@ -159,17 +161,17 @@
   init();
 </script>
 
-<main>
+<main {dir}>
   {#if loading}
-    <p class="status">Loading...</p>
+    <p class="status">{msg('common_loading')}</p>
   {:else if view === 'list'}
     <div class="header-banner">
       <div class="header-banner-content">
         <div>
-          <h1>YouTube Notes</h1>
-          <p class="subtitle">Your video notes collection</p>
+          <h1>{msg('common_youtubeNotes')}</h1>
+          <p class="subtitle">{msg('popup_subtitle')}</p>
         </div>
-        <button class="expand-btn" onclick={openFullPage} title="Open full page">
+        <button class="expand-btn" onclick={openFullPage} title={msg('popup_openFullPage')}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 3h6v6"/>
             <path d="M10 14L21 3"/>
@@ -182,7 +184,7 @@
     <div class="body-content">
       {#if currentVideoId}
         <button class="current-video-btn" onclick={openCurrentVideo}>
-          Current video notes &rarr;
+          {msg('popup_currentVideoNotes')} &rarr;
         </button>
       {/if}
 
@@ -190,11 +192,11 @@
     </div>
   {:else}
     <div class="notes-view">
-      <button class="back-btn" onclick={goBack}>&larr; Back</button>
+      <button class="back-btn" onclick={goBack}>&larr; {msg('popup_back')}</button>
       <h2 class="video-title">{selectedVideo?.title || selectedVideo?.videoId}</h2>
       {#if selectedVideo?.url}
         <a class="open-youtube-link" href={selectedVideo.url} onclick={(e) => { e.preventDefault(); openOnYouTube(); }}>
-          Open on YouTube
+          {msg('common_openOnYouTube')}
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
             <polyline points="15 3 21 3 21 9"/>
@@ -295,7 +297,7 @@
     cursor: pointer;
     font-size: 13px;
     font-weight: 500;
-    text-align: left;
+    text-align: start;
     font-family: inherit;
   }
 

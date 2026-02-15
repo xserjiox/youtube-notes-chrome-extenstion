@@ -1,10 +1,13 @@
 <script>
-  let { onclick, noteCount = 0, size = 48, title = 'YouTube Notes' } = $props();
+  import { msg } from '../lib/i18n.js';
+
+  let { onclick, noteCount = 0, size = 48, title = undefined } = $props();
 
   const iconSize = $derived(Math.round(size * 0.42));
+  const resolvedTitle = $derived(title ?? msg('common_youtubeNotes'));
 </script>
 
-<button class="fab" {onclick} {title} style="width: {size}px; height: {size}px;">
+<button class="fab" {onclick} title={resolvedTitle} style="width: {size}px; height: {size}px;">
   <svg
     width={iconSize}
     height={iconSize}

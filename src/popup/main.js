@@ -1,6 +1,7 @@
 import App from './App.svelte';
 import { mount } from 'svelte';
+import { initLocale } from '../lib/i18n.js';
 
-const app = mount(App, { target: document.getElementById('app') });
-
-export default app;
+initLocale().then(() => {
+  mount(App, { target: document.getElementById('app') });
+});
