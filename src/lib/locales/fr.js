@@ -8,6 +8,7 @@ export default {
   common_openOnYouTube: 'Ouvrir sur YouTube',
   common_youtubeNotes: 'YouTube Notes',
   common_videoNotes: 'Notes de la vidéo',
+  common_deleteAll: 'Tout supprimer',
 
   noteInput_placeholder: 'Écrivez votre note ici...',
   noteInput_toggleTimestamp: 'Activer/désactiver l\'horodatage',

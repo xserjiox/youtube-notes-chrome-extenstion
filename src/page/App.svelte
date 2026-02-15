@@ -1,5 +1,5 @@
 <script>
-  import { getAllVideosWithNotes, getNotes, addNote, deleteNote, updateNoteText } from '../lib/storage.js';
+  import { getAllVideosWithNotes, getNotes, addNote, deleteNote, deleteAllNotes, updateNoteText } from '../lib/storage.js';
   import { msg, currentLocale, setLocale, onLocaleChange, isRTL } from '../lib/i18n.js';
   import { currentTheme, setTheme, onThemeChange } from '../lib/theme.js';
   import { LOCALE_LABELS } from '../lib/locales/index.js';
@@ -60,6 +60,15 @@
       await loadAll();
     } catch (err) {
       console.error('[YT-Notes] Failed to delete note:', err);
+    }
+  }
+
+  async function handleDeleteAll(videoId) {
+    try {
+      await deleteAllNotes(videoId);
+      await loadAll();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to delete all notes:', err);
     }
   }
 
@@ -132,6 +141,7 @@
           notes={videoNotes[video.videoId] || []}
           onaddnote={handleAddNote}
           ondeletenote={handleDelete}
+          ondeleteall={handleDeleteAll}
           oneditnote={handleEdit}
           onseek={handleSeek}
         />

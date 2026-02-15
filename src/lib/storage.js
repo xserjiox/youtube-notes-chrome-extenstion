@@ -69,6 +69,12 @@ export function deleteNote(videoId, noteId) {
   });
 }
 
+export function deleteAllNotes(videoId) {
+  return _serialize(videoId, async () => {
+    await chrome.storage.local.remove([`notes:${videoId}`, `meta:${videoId}`]);
+  });
+}
+
 export function updateNoteText(videoId, noteId, newText) {
   return _serialize(videoId, async () => {
     const key = `notes:${videoId}`;

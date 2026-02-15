@@ -8,6 +8,7 @@ export default {
   common_openOnYouTube: 'Open on YouTube',
   common_youtubeNotes: 'YouTube Notes',
   common_videoNotes: 'Video Notes',
+  common_deleteAll: 'Delete all',
 
   noteInput_placeholder: 'Write your note here...',
   noteInput_toggleTimestamp: 'Toggle timestamp',

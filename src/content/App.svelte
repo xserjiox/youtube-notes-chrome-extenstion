@@ -1,7 +1,7 @@
 <script>
   import { parseVideoId } from '../lib/utils.js';
   import { OPEN_NOTES_EVENT, CLOSE_NOTES_EVENT } from '../lib/constants.js';
-  import { getNotes, addNote, deleteNote, updateNoteText, getVideoMeta, setVideoMeta } from '../lib/storage.js';
+  import { getNotes, addNote, deleteNote, deleteAllNotes, updateNoteText, getVideoMeta, setVideoMeta } from '../lib/storage.js';
   import { msg } from '../lib/i18n.js';
   import Trigger from './Trigger.svelte';
   import Overlay from './Overlay.svelte';
@@ -112,6 +112,18 @@
       if (!externalMode) noteCount = notes.length;
     } catch (err) {
       console.error('[YT-Notes] Failed to delete note:', err);
+    }
+  }
+
+  async function handleDeleteAll() {
+    if (!effectiveVideoId) return;
+    try {
+      await deleteAllNotes(effectiveVideoId);
+      notes = [];
+      noteCount = 0;
+      handleClose();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to delete all notes:', err);
     }
   }
 
@@ -281,6 +293,36 @@
       {adPlaying}
       showTimestampToggle={!externalMode}
     />
+    {#if notes.length > 0}
+      <button class="delete-all-btn" onclick={handleDeleteAll}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        {msg('common_deleteAll')}
+      </button>
+    {/if}
     <NotesList {notes} expanded={true} ondelete={handleDelete} onseek={externalMode ? null : handleSeek} onedit={handleEdit} />
   </Overlay>
 {/if}
+
+<style>
+  .delete-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--ytn-error, #e53935);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 2px 0;
+    font-family: inherit;
+    margin-bottom: 8px;
+  }
+
+  .delete-all-btn:hover {
+    text-decoration: underline;
+  }
+</style>

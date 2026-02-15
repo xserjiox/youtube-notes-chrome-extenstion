@@ -8,6 +8,7 @@ export default {
   common_openOnYouTube: 'Auf YouTube öffnen',
   common_youtubeNotes: 'YouTube Notes',
   common_videoNotes: 'Video-Notizen',
+  common_deleteAll: 'Alle löschen',
 
   noteInput_placeholder: 'Schreiben Sie Ihre Notiz hier...',
   noteInput_toggleTimestamp: 'Zeitstempel umschalten',

@@ -5,7 +5,7 @@
   import { getThumbnailUrl } from '../lib/utils.js';
   import { msg, plural } from '../lib/i18n.js';
 
-  let { video, notes, onaddnote, ondeletenote, oneditnote, onseek } = $props();
+  let { video, notes, onaddnote, ondeletenote, ondeleteall, oneditnote, onseek } = $props();
 
   let expanded = $state(false);
   let showInput = $state(false);
@@ -55,13 +55,22 @@
 
   {#if expanded}
     <div class="accordion-body">
-      <button class="secondary add-note-btn" onclick={toggleInput}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-        {msg('videoAccordion_addNote')}
-      </button>
+      <div class="accordion-actions">
+        <button class="secondary add-note-btn" onclick={toggleInput}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          {msg('videoAccordion_addNote')}
+        </button>
+        <button class="secondary delete-all-btn" onclick={() => ondeleteall?.(video.videoId)}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          {msg('common_deleteAll')}
+        </button>
+      </div>
 
       {#if showInput}
         <div class="note-input-wrapper">
@@ -194,8 +203,21 @@
     background: var(--ytn-surface-hover);
   }
 
-  .add-note-btn {
+  .accordion-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 12px;
+  }
+
+  .delete-all-btn {
+    color: var(--ytn-error, #e53935);
+  }
+
+  .delete-all-btn:hover {
+    background: var(--ytn-error, #e53935);
+    color: #fff;
+    border-color: var(--ytn-error, #e53935);
   }
 
   .note-input-wrapper {

@@ -4,6 +4,7 @@
     getNotes,
     addNote,
     deleteNote,
+    deleteAllNotes,
     updateNoteText,
     getAllVideosWithNotes,
     getVideoMeta,
@@ -88,6 +89,16 @@
       }
     } catch (err) {
       console.error('[YT-Notes] Failed to delete note:', err);
+    }
+  }
+
+  async function handleDeleteAll() {
+    if (!selectedVideo) return;
+    try {
+      await deleteAllNotes(selectedVideo.videoId);
+      goBack();
+    } catch (err) {
+      console.error('[YT-Notes] Failed to delete all notes:', err);
     }
   }
 
@@ -235,16 +246,25 @@
     <div class="notes-view">
       <button class="back-btn" onclick={goBack}>&larr; {msg('popup_back')}</button>
       <h2 class="video-title">{selectedVideo?.title || selectedVideo?.videoId}</h2>
-      {#if selectedVideo?.url}
-        <a class="open-youtube-link" href={selectedVideo.url} onclick={(e) => { e.preventDefault(); openOnYouTube(); }}>
-          {msg('common_openOnYouTube')}
+      <div class="notes-actions">
+        {#if selectedVideo?.url}
+          <a class="open-youtube-link" href={selectedVideo.url} onclick={(e) => { e.preventDefault(); openOnYouTube(); }}>
+            {msg('common_openOnYouTube')}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+        {/if}
+        <button class="delete-all-btn" onclick={handleDeleteAll}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-            <polyline points="15 3 21 3 21 9"/>
-            <line x1="10" y1="14" x2="21" y2="3"/>
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
           </svg>
-        </a>
-      {/if}
+          {msg('common_deleteAll')}
+        </button>
+      </div>
 
       <div class="notes-content">
         <NoteInput onsave={handleSave} />
@@ -453,6 +473,13 @@
     color: var(--ytn-text);
   }
 
+  .notes-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
   .open-youtube-link {
     display: inline-flex;
     align-items: center;
@@ -460,11 +487,32 @@
     font-size: 12px;
     color: var(--ytn-brand);
     text-decoration: none;
-    margin-bottom: 12px;
   }
 
   .open-youtube-link:hover {
     text-decoration: underline;
+  }
+
+  .delete-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ytn-error);
+    background: var(--ytn-surface);
+    border: 1px solid var(--ytn-border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-inline-start: auto;
+  }
+
+  .delete-all-btn:hover {
+    background: var(--ytn-error);
+    color: #fff;
+    border-color: var(--ytn-error);
   }
 
   .notes-content {

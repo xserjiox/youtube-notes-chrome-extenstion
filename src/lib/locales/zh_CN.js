@@ -8,6 +8,7 @@ export default {
   common_openOnYouTube: '在 YouTube 上打开',
   common_youtubeNotes: 'YouTube 笔记',
   common_videoNotes: '视频笔记',
+  common_deleteAll: '全部删除',
 
   noteInput_placeholder: '在这里写下你的笔记...',
   noteInput_toggleTimestamp: '切换时间戳',

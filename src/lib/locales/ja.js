@@ -8,6 +8,7 @@ export default {
   common_openOnYouTube: 'YouTube で開く',
   common_youtubeNotes: 'YouTube ノート',
   common_videoNotes: '動画メモ',
+  common_deleteAll: 'すべて削除',
 
   noteInput_placeholder: 'ここにメモを書いてください...',
   noteInput_toggleTimestamp: 'タイムスタンプ切り替え',

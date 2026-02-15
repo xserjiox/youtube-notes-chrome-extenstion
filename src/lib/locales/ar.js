@@ -8,6 +8,7 @@ export default {
   common_openOnYouTube: 'فتح على يوتيوب',
   common_youtubeNotes: 'YouTube Notes',
   common_videoNotes: 'ملاحظات الفيديو',
+  common_deleteAll: 'حذف الكل',
 
   noteInput_placeholder: 'اكتب ملاحظتك هنا...',
   noteInput_toggleTimestamp: 'تبديل الطابع الزمني',

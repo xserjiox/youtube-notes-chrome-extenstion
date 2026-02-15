@@ -8,6 +8,7 @@ export default {
   common_openOnYouTube: 'Відкрити на YouTube',
   common_youtubeNotes: 'YouTube Notes',
   common_videoNotes: 'Нотатки до відео',
+  common_deleteAll: 'Видалити все',
 
   noteInput_placeholder: 'Напишіть свою нотатку тут...',
   noteInput_toggleTimestamp: 'Перемкнути мітку часу',
