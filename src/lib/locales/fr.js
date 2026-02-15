@@ -46,4 +46,9 @@ export default {
   popup_back: 'Retour',
 
   thumbnail_notes: 'Notes',
+
+  theme_label: 'Thème',
+  theme_light: 'Clair',
+  theme_dark: 'Sombre',
+  theme_system: 'Système',
 };

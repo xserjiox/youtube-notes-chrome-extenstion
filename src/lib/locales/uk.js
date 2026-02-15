@@ -47,4 +47,9 @@ export default {
   popup_back: 'Назад',
 
   thumbnail_notes: 'Нотатки',
+
+  theme_label: 'Тема',
+  theme_light: 'Світла',
+  theme_dark: 'Темна',
+  theme_system: 'Системна',
 };

@@ -46,4 +46,9 @@ export default {
   popup_back: 'Indietro',
 
   thumbnail_notes: 'Note',
+
+  theme_label: 'Tema',
+  theme_light: 'Chiaro',
+  theme_dark: 'Scuro',
+  theme_system: 'Sistema',
 };

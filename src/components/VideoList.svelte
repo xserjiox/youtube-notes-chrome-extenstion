@@ -25,7 +25,7 @@
   }
 
   .empty {
-    color: #999;
+    color: var(--ytn-text-muted);
     font-size: 13px;
     margin: 12px 0;
   }

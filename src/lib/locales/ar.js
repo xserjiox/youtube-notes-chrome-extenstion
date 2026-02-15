@@ -50,4 +50,9 @@ export default {
   popup_back: 'رجوع',
 
   thumbnail_notes: 'ملاحظات',
+
+  theme_label: 'المظهر',
+  theme_light: 'فاتح',
+  theme_dark: 'داكن',
+  theme_system: 'النظام',
 };

@@ -45,4 +45,9 @@ export default {
   popup_back: '戻る',
 
   thumbnail_notes: 'メモ',
+
+  theme_label: 'テーマ',
+  theme_light: 'ライト',
+  theme_dark: 'ダーク',
+  theme_system: 'システム',
 };

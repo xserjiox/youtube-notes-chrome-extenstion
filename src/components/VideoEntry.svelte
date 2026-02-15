@@ -1,6 +1,7 @@
 <script>
   import { getThumbnailUrl } from '../lib/utils.js';
   import { msg, plural } from '../lib/i18n.js';
+  import Badge from './Badge.svelte';
 
   let { video, onclick } = $props();
 
@@ -42,7 +43,7 @@
       <span class="meta-notes">{plural('notesList_count', video.noteCount)}</span>
     </div>
   </div>
-  <span class="badge">{video.noteCount}</span>
+  <span class="badge-wrapper"><Badge count={video.noteCount} /></span>
 </button>
 
 <style>
@@ -51,19 +52,19 @@
     align-items: center;
     width: 100%;
     padding: 12px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--ytn-border);
     border-radius: 8px;
-    background: #fff;
+    background: var(--ytn-surface);
     cursor: pointer;
     text-align: start;
     font-family: inherit;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--ytn-shadow-sm);
     transition: box-shadow 0.15s, border-color 0.15s;
     box-sizing: border-box;
   }
 
   .video-entry:hover {
-    border-color: #ccc;
+    border-color: var(--ytn-text-muted);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   }
 
@@ -85,7 +86,7 @@
     display: block;
     font-size: 13px;
     font-weight: 500;
-    color: #1a1a1a;
+    color: var(--ytn-text);
     line-height: 1.4;
   }
 
@@ -95,7 +96,7 @@
     gap: 4px;
     margin-top: 4px;
     font-size: 11px;
-    color: #888;
+    color: var(--ytn-text-muted);
   }
 
   .meta-icon {
@@ -106,19 +107,7 @@
     margin: 0 1px;
   }
 
-  .badge {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 24px;
-    height: 24px;
-    padding: 0 6px;
-    background: var(--ytn-brand, #cc0000);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 12px;
+  .badge-wrapper {
     margin-inline-start: 10px;
   }
 </style>

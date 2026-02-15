@@ -100,7 +100,7 @@
 <style>
   .note-item {
     padding: var(--note-item-padding, 14px 16px);
-    border: var(--note-item-border, 1px solid #e0e0e0);
+    border: var(--note-item-border, 1px solid var(--ytn-border));
     border-radius: var(--note-item-radius, 10px);
     box-shadow: var(--note-item-shadow, none);
     transition: background 0.15s, box-shadow 0.15s;
@@ -114,7 +114,7 @@
   }
 
   .note-item:not(.editing):hover {
-    background: var(--note-item-hover-bg, #f5f5f5);
+    background: var(--note-item-hover-bg, var(--ytn-surface-hover));
     box-shadow: var(--note-item-hover-shadow, none);
   }
 
@@ -142,9 +142,9 @@
     flex-direction: column;
     gap: 10px;
     padding: 16px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--ytn-border);
     border-radius: 12px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--ytn-shadow-md);
   }
 
   .timestamp {
@@ -166,7 +166,7 @@
 
   .text {
     font-size: 13px;
-    color: #1a1a1a;
+    color: var(--ytn-text);
     line-height: 1.4;
     word-break: break-word;
   }
@@ -175,7 +175,7 @@
     background: none;
     border: none;
     padding: 0;
-    color: #1a73e8;
+    color: var(--ytn-link);
     font-size: inherit;
     cursor: pointer;
     font-family: inherit;
@@ -192,18 +192,18 @@
     font-size: 14px;
     font-family: inherit;
     padding: 12px 14px;
-    background: #f5f5f5;
-    border: 1px solid #ddd;
+    background: var(--ytn-input-bg);
+    border: 1px solid var(--ytn-border);
     border-radius: 10px;
     resize: vertical;
     box-sizing: border-box;
-    color: #1a1a1a;
+    color: var(--ytn-text);
   }
 
   .edit-textarea:focus {
     outline: none;
-    border-color: #aaa;
-    background: #f0f0f0;
+    border-color: var(--ytn-text-muted);
+    background: var(--ytn-input-bg-focus);
   }
 
   .edit-actions {
@@ -226,30 +226,30 @@
   }
 
   .save-btn {
-    background: #1a1a1a;
-    color: white;
-    border-color: #1a1a1a;
+    background: var(--ytn-btn-primary-bg);
+    color: var(--ytn-btn-primary-text);
+    border-color: var(--ytn-btn-primary-bg);
   }
 
   .save-btn:hover {
-    background: #333;
+    background: var(--ytn-btn-primary-hover);
   }
 
   .cancel-btn {
-    background: #fff;
-    color: #555;
-    border-color: #ddd;
+    background: var(--ytn-surface);
+    color: var(--ytn-text-secondary);
+    border-color: var(--ytn-border);
   }
 
   .cancel-btn:hover {
-    background: #f5f5f5;
+    background: var(--ytn-surface-hover);
   }
 
   .edit-btn,
   .delete-btn {
     background: none;
     border: none;
-    color: #999;
+    color: var(--ytn-icon-muted);
     cursor: pointer;
     padding: 6px;
     line-height: 1;
@@ -258,8 +258,8 @@
   }
 
   .edit-btn:hover {
-    background: #e0e0e0;
-    color: #555;
+    background: var(--ytn-surface-hover);
+    color: var(--ytn-text-secondary);
   }
 
   .delete-btn:hover {

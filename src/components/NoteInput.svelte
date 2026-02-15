@@ -132,16 +132,16 @@
     resize: vertical;
     min-height: 60px;
     outline: none;
-    background: #f5f5f5;
-    color: #1a1a1a;
+    background: var(--ytn-input-bg);
+    color: var(--ytn-text);
   }
 
   textarea::placeholder {
-    color: #999;
+    color: var(--ytn-text-muted);
   }
 
   textarea:focus {
-    background: #f0f0f0;
+    background: var(--ytn-input-bg-focus);
   }
 
   .actions-row {
@@ -161,42 +161,45 @@
     width: 36px;
     height: 20px;
     border-radius: 10px;
-    background: #ccc;
-    border: none;
+    background: transparent;
+    border: 2px solid var(--ytn-icon);
+    box-sizing: border-box;
     padding: 0;
     position: relative;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, border-color 0.2s;
     flex-shrink: 0;
   }
 
   .toggle-track.active {
-    background: #1a1a1a;
+    background: var(--ytn-brand);
+    border-color: var(--ytn-brand);
   }
 
   .toggle-thumb {
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    background: white;
+    background: var(--ytn-icon);
     position: absolute;
     top: 2px;
     left: 2px;
-    transition: transform 0.2s;
+    transition: transform 0.2s, background 0.2s;
   }
 
   .toggle-track.active .toggle-thumb {
     transform: translateX(16px);
+    background: #fff;
   }
 
   .clock-icon {
     flex-shrink: 0;
-    color: #555;
+    color: var(--ytn-text-secondary);
   }
 
   .timestamp-label {
     font-size: 13px;
-    color: #333;
+    color: var(--ytn-text);
     user-select: none;
     white-space: nowrap;
   }
@@ -222,28 +225,28 @@
     font-weight: 600;
     padding: 0 2px;
     border: none;
-    border-bottom: 1px solid #999;
+    border-bottom: 1px solid var(--ytn-text-muted);
     border-radius: 0;
     outline: none;
     background: transparent;
-    color: #333;
+    color: var(--ytn-text);
   }
 
   .ts-inline-input:focus {
-    border-bottom-color: #1a1a1a;
+    border-bottom-color: var(--ytn-text);
   }
 
   .ts-inline-input.invalid {
-    border-bottom-color: #e53935;
-    color: #e53935;
+    border-bottom-color: var(--ytn-error, #e53935);
+    color: var(--ytn-error, #e53935);
   }
 
   .save-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #333;
-    color: white;
+    background: var(--ytn-btn-primary-bg);
+    color: var(--ytn-btn-primary-text);
     border: none;
     border-radius: 6px;
     padding: 8px 16px;
@@ -255,7 +258,7 @@
   }
 
   .save-btn:hover:not(:disabled) {
-    background: #444;
+    background: var(--ytn-btn-primary-hover);
   }
 
   .save-btn:disabled {

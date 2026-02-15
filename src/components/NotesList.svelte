@@ -29,13 +29,13 @@
   }
 
   .empty {
-    color: #999;
+    color: var(--ytn-text-muted);
     font-size: 13px;
     margin: 8px 0;
   }
 
   .collapsed-count {
-    color: #666;
+    color: var(--ytn-icon);
     font-size: 13px;
     margin: 4px 0;
   }

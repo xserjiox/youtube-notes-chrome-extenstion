@@ -45,4 +45,9 @@ export default {
   popup_back: '返回',
 
   thumbnail_notes: '笔记',
+
+  theme_label: '主题',
+  theme_light: '浅色',
+  theme_dark: '深色',
+  theme_system: '跟随系统',
 };

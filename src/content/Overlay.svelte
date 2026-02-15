@@ -49,22 +49,23 @@
     pointer-events: auto;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--ytn-backdrop);
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   .modal {
-    background: white;
+    background: var(--ytn-surface);
     border-radius: 12px;
     width: 620px;
     max-width: 90vw;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--ytn-shadow-lg);
     font-family: system-ui, -apple-system, sans-serif;
+    color: var(--ytn-text);
   }
 
   .modal-header {
@@ -72,13 +73,13 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--ytn-border-light);
   }
 
   .modal-header h2 {
     margin: 0;
     font-size: 16px;
-    color: #1a1a1a;
+    color: var(--ytn-text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -90,7 +91,7 @@
     background: none;
     border: none;
     font-size: 22px;
-    color: #999;
+    color: var(--ytn-icon-muted);
     cursor: pointer;
     padding: 0 4px;
     line-height: 1;
@@ -99,7 +100,7 @@
   }
 
   .close-btn:hover {
-    color: #333;
+    color: var(--ytn-text-secondary);
   }
 
   .modal-body {
@@ -111,8 +112,8 @@
   .modal-footer {
     text-align: center;
     font-size: 11px;
-    color: #999;
+    color: var(--ytn-text-muted);
     padding: 10px 20px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--ytn-border-light);
   }
 </style>

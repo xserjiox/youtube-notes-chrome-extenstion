@@ -1,6 +1,7 @@
 <script>
   import NoteInput from './NoteInput.svelte';
   import NotesList from './NotesList.svelte';
+  import Badge from './Badge.svelte';
   import { getThumbnailUrl } from '../lib/utils.js';
   import { msg, plural } from '../lib/i18n.js';
 
@@ -33,7 +34,7 @@
       <div class="header-info">
         <h2 class="video-title">{video.title || video.videoId}</h2>
       </div>
-      <span class="count-badge">{notes.length}</span>
+      <Badge count={notes.length} />
     </div>
 
     <div class="video-meta">
@@ -47,7 +48,7 @@
           {msg('common_openOnYouTube')}
         </a>
       {/if}
-      <span class="meta-separator">·</span>
+      <span class="meta-separator">&middot;</span>
       <span class="meta-count">{plural('notesList_count', notes.length)}</span>
     </div>
   </div>
@@ -81,9 +82,9 @@
 
 <style>
   .accordion {
-    background: #fff;
+    background: var(--ytn-surface);
     border-radius: 12px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--ytn-shadow-md);
     margin-bottom: 16px;
     overflow: hidden;
   }
@@ -95,7 +96,7 @@
   }
 
   .accordion-top:hover {
-    background: #f5f5f5;
+    background: var(--ytn-surface-hover);
   }
 
   .accordion-header {
@@ -107,7 +108,7 @@
 
   .chevron {
     flex-shrink: 0;
-    color: #666;
+    color: var(--ytn-icon);
     transition: transform 0.2s ease;
   }
 
@@ -132,26 +133,11 @@
     margin: 0;
     font-size: 16px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--ytn-text);
     line-height: 1.3;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .count-badge {
-    flex-shrink: 0;
-    background: #333;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    min-width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 2px;
   }
 
   .video-meta {
@@ -172,7 +158,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: #1565c0;
+    color: var(--ytn-brand, #cc0000);
     text-decoration: none;
     font-weight: 500;
   }
@@ -182,11 +168,11 @@
   }
 
   .meta-separator {
-    color: #bbb;
+    color: var(--ytn-text-muted);
   }
 
   .meta-count {
-    color: #888;
+    color: var(--ytn-text-muted);
   }
 
   .secondary {
@@ -196,16 +182,16 @@
     padding: 6px 14px;
     font-size: 13px;
     font-weight: 500;
-    color: #555;
-    background: #fff;
-    border: 1px solid #ddd;
+    color: var(--ytn-text-secondary);
+    background: var(--ytn-surface);
+    border: 1px solid var(--ytn-border);
     border-radius: 8px;
     cursor: pointer;
     font-family: inherit;
   }
 
   .secondary:hover {
-    background: #f5f5f5;
+    background: var(--ytn-surface-hover);
   }
 
   .add-note-btn {

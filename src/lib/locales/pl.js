@@ -47,4 +47,9 @@ export default {
   popup_back: 'Wstecz',
 
   thumbnail_notes: 'Notatki',
+
+  theme_label: 'Motyw',
+  theme_light: 'Jasny',
+  theme_dark: 'Ciemny',
+  theme_system: 'Systemowy',
 };
